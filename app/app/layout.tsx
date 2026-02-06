@@ -1,87 +1,30 @@
 'use client'
 
-import React from "react"
-
-import { useAuth } from '@/lib/auth-context'
+import React from 'react'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { Button } from '@/components/ui/button'
+import { useAuth } from '@/lib/auth-context'
 
 const SIDEBAR_MENU = [
-  {
-    label: 'Dashboard',
-    href: '/app',
-    icon: '📊',
-    permissions: [],
-  },
-  {
-    label: 'Reservations',
-    href: '/app/reservations',
-    icon: '📅',
-    permissions: ['manage_reservations', 'view_guests'],
-  },
-  {
-    label: 'Rooms',
-    href: '/app/rooms',
-    icon: '🏨',
-    permissions: ['manage_rooms'],
-  },
-  {
-    label: 'Guests',
-    href: '/app/guests',
-    icon: '👥',
-    permissions: ['view_guests', 'manage_guests'],
-  },
-  {
-    label: 'Restaurant',
-    href: '/app/orders',
-    icon: '🍽️',
-    permissions: ['manage_orders', 'manage_menu'],
-  },
-  {
-    label: 'Inventory',
-    href: '/app/inventory',
-    icon: '📦',
-    permissions: ['manage_inventory'],
-  },
-  {
-    label: 'Housekeeping',
-    href: '/app/housekeeping',
-    icon: '🧹',
-    permissions: ['manage_tasks'],
-  },
-  {
-    label: 'Staff',
-    href: '/app/staff',
-    icon: '👨‍💼',
-    permissions: ['manage_staff'],
-  },
-  {
-    label: 'Reports',
-    href: '/app/reports',
-    icon: '📈',
-    permissions: ['view_reports'],
-  },
-  {
-    label: 'Settings',
-    href: '/app/settings',
-    icon: '⚙️',
-    permissions: ['access_settings', 'manage_roles'],
-  },
+  { label: 'Dashboard', href: '/app', icon: '📊', permissions: [] },
+  { label: 'Reservations', href: '/app/reservations', icon: '📅', permissions: ['manage_reservations'] },
+  { label: 'Rooms', href: '/app/rooms', icon: '🏨', permissions: ['manage_rooms'] },
+  { label: 'Guests', href: '/app/guests', icon: '👥', permissions: ['view_guests'] },
+  { label: 'Restaurant', href: '/app/orders', icon: '🍽️', permissions: ['manage_orders'] },
+  { label: 'Inventory', href: '/app/inventory', icon: '📦', permissions: ['manage_inventory'] },
+  { label: 'Housekeeping', href: '/app/housekeeping', icon: '🧹', permissions: ['manage_tasks'] },
+  { label: 'Staff', href: '/app/staff', icon: '👨‍💼', permissions: ['manage_staff'] },
+  { label: 'Reports', href: '/app/reports', icon: '📈', permissions: ['view_reports'] },
+  { label: 'Settings', href: '/app/settings', icon: '⚙️', permissions: ['access_settings'] },
 ]
 
-export default function AppLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, role, isLoggedIn, isLoading, logout, hasAnyPermission } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(true)
 
-  // Redirect to login if not authenticated
   useEffect(() => {
     if (!isLoading && !isLoggedIn) {
       router.push('/login')
@@ -99,12 +42,7 @@ export default function AppLayout({
   return (
     <div className="min-h-screen bg-slate-50 flex">
       {/* Sidebar */}
-      <aside
-        className={`${
-          sidebarOpen ? 'w-64' : 'w-20'
-        } bg-slate-900 text-white transition-all duration-300 hidden md:flex flex-col border-r border-slate-800`}
-      >
-        {/* Logo */}
+      <aside className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-slate-900 text-white transition-all duration-300 hidden md:flex flex-col border-r border-slate-800`}>
         <div className="p-4 border-b border-slate-800">
           <Link href="/app" className="flex items-center gap-2 font-bold text-lg">
             <span className="text-2xl">🏨</span>
@@ -112,7 +50,6 @@ export default function AppLayout({
           </Link>
         </div>
 
-        {/* Navigation Menu */}
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           {visibleMenuItems.map((item) => (
             <Link
@@ -130,7 +67,6 @@ export default function AppLayout({
           ))}
         </nav>
 
-        {/* User Info & Logout */}
         <div className="p-4 border-t border-slate-800 space-y-2">
           {sidebarOpen && (
             <div className="text-xs text-slate-400 truncate">
@@ -140,15 +76,14 @@ export default function AppLayout({
               <div className="text-slate-500 truncate">{role?.name}</div>
             </div>
           )}
-          <Button
+          <button
             onClick={logout}
-            className="w-full bg-slate-700 hover:bg-slate-600 text-white text-sm"
+            className="w-full px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded-lg transition"
           >
             {sidebarOpen ? 'Sign Out' : '⬅️'}
-          </Button>
+          </button>
         </div>
 
-        {/* Toggle Sidebar */}
         <div className="p-2 border-t border-slate-800">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -162,7 +97,6 @@ export default function AppLayout({
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
-        {/* Top Bar */}
         <header className="bg-white border-b border-slate-200 px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -178,14 +112,16 @@ export default function AppLayout({
             </div>
             <div className="text-sm text-slate-600 flex items-center gap-2">
               <span className="hidden sm:inline">Role: {role?.name}</span>
-              <Button onClick={logout} variant="outline" size="sm">
+              <button
+                onClick={logout}
+                className="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-100 transition text-sm"
+              >
                 Sign Out
-              </Button>
+              </button>
             </div>
           </div>
         </header>
 
-        {/* Page Content */}
         <main className="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
           {children}
         </main>
