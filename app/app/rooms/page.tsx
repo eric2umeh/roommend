@@ -1,9 +1,5 @@
 'use client'
 
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { ProtectedRoute } from '@/components/protected-route'
 import { mockRooms, mockRoomTypes } from '@/lib/mock-data'
 
 const statusColors: Record<string, string> = {
@@ -15,66 +11,42 @@ const statusColors: Record<string, string> = {
 
 export default function RoomsPage() {
   return (
-    <ProtectedRoute requiredPermissions={['manage_rooms']}>
-      <div className="space-y-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <Link href="/app" className="text-blue-600 hover:underline text-sm mb-2 inline-block">
-              ← Back to Dashboard
-            </Link>
-            <h1 className="text-3xl font-bold text-slate-900">Rooms & Inventory</h1>
-            <p className="text-slate-600 mt-1">Manage room types and room instances</p>
-          </div>
-        </div>
+    <div className="space-y-8">
+      <h1 className="text-3xl font-bold text-slate-900">Rooms & Inventory</h1>
 
-        {/* Room Types */}
-        <div>
-          <h2 className="text-xl font-bold text-slate-900 mb-4">Room Types</h2>
-          <div className="grid md:grid-cols-3 gap-4">
-            {mockRoomTypes.map((rt) => (
-              <Card key={rt.id}>
-                <CardHeader>
-                  <CardTitle>{rt.name}</CardTitle>
-                  <CardDescription>Capacity: {rt.capacity} guests</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <div>
-                    <div className="text-2xl font-bold text-blue-600">₦{rt.base_price_naira.toLocaleString()}</div>
-                    <div className="text-xs text-slate-500">per night</div>
-                  </div>
-                  <div className="text-sm text-slate-600">{rt.description}</div>
-                  <Button variant="outline" size="sm" className="w-full bg-transparent">
-                    Edit
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-
-        {/* Rooms Grid */}
-        <div>
-          <h2 className="text-xl font-bold text-slate-900 mb-4">All Rooms</h2>
-          <div className="grid md:grid-cols-4 gap-4">
-            {mockRooms.map((room) => (
-              <Card key={room.id}>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">Room {room.room_number}</CardTitle>
-                  <CardDescription>Floor {room.floor}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className={`px-3 py-1 rounded text-xs font-medium text-center ${statusColors[room.status]}`}>
-                    {room.status.charAt(0).toUpperCase() + room.status.slice(1)}
-                  </div>
-                  <Button variant="outline" size="sm" className="w-full mt-3 bg-transparent">
-                    View Details
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+      {/* Room Types */}
+      <div>
+        <h2 className="text-xl font-bold text-slate-900 mb-4">Room Types</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {mockRoomTypes.map((type) => (
+            <div key={type.id} className="bg-white rounded-lg border border-slate-200 p-6">
+              <h3 className="font-bold text-slate-900 mb-2">{type.name}</h3>
+              <p className="text-sm text-slate-600 mb-4">Capacity: {type.capacity} guests</p>
+              <div className="text-xl font-bold text-blue-600">₦{type.base_price_naira.toLocaleString()}</div>
+              <p className="text-xs text-slate-500 mt-1">per night</p>
+            </div>
+          ))}
         </div>
       </div>
-    </ProtectedRoute>
+
+      {/* Room Instances */}
+      <div>
+        <h2 className="text-xl font-bold text-slate-900 mb-4">All Rooms</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {mockRooms.map((room) => (
+            <div key={room.id} className="bg-white rounded-lg border border-slate-200 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-bold text-slate-900">Room {room.room_number}</h3>
+                <span className={`text-xs px-2 py-1 rounded-full font-medium capitalize ${statusColors[room.status]}`}>
+                  {room.status}
+                </span>
+              </div>
+              <p className="text-sm text-slate-600">Floor {room.floor}</p>
+              {room.notes && <p className="text-xs text-slate-500 mt-2">{room.notes}</p>}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   )
 }
