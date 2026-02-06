@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { authUtils } from '@/lib/auth-utils'
+import { useAuth } from '@/lib/auth-context'
 
 const DEMO_CREDENTIALS = [
   { email: 'eric@grandbohabs.com', role: 'Admin', password: 'demo' },
@@ -13,6 +13,7 @@ const DEMO_CREDENTIALS = [
 
 export default function LoginPage() {
   const router = useRouter()
+  const { login } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -24,10 +25,10 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      const result = await authUtils.login(email, password)
-      if (result) {
-        localStorage.setItem('user', JSON.stringify(result.user))
-        localStorage.setItem('role', JSON.stringify(result.role))
+      const success = await login(email, password)
+      if (success) {
+        // Small delay to ensure context updates
+        await new Promise(resolve => setTimeout(resolve, 100))
         router.push('/app')
       } else {
         setError('Invalid email or password')
