@@ -1,67 +1,72 @@
-'use client'
+"use client";
 
-import React, { useState } from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useAuth } from '@/lib/auth-context'
+import React, { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/auth-context";
 
 const DEMO_CREDENTIALS = [
-  { email: '***REMOVED***', role: 'Admin', password: 'demo' },
-  { email: '***REMOVED***', role: 'Front Desk', password: 'demo' },
-  { email: '***REMOVED***', role: 'Housekeeping', password: 'demo' },
-]
+  { email: "***REMOVED***", role: "Admin", password: "demo" },
+  { email: "***REMOVED***", role: "Front Desk", password: "demo" },
+  { email: "***REMOVED***", role: "Housekeeping", password: "demo" },
+];
 
 export default function LoginPage() {
-  const router = useRouter()
-  const { login } = useAuth()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const router = useRouter();
+  const { login } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
     try {
-      const success = await login(email, password)
+      const success = await login(email, password);
       if (success) {
         // Small delay to ensure context updates
-        await new Promise(resolve => setTimeout(resolve, 100))
-        router.push('/app')
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        router.push("/app");
       } else {
-        setError('Invalid email or password')
+        setError("Invalid email or password");
       }
     } catch (err) {
-      setError('Login failed. Please try again.')
+      setError("Login failed. Please try again.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const quickLogin = (demoEmail: string) => {
-    setEmail(demoEmail)
-    setPassword('demo')
-  }
+    setEmail(demoEmail);
+    setPassword("demo");
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-slate-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 to-slate-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="text-4xl font-bold text-slate-900 mb-2">
             <span className="text-blue-600">Room</span>mend
           </div>
-          <p className="text-slate-600">Hotel & Restaurant Management</p>
+          <p className="text-slate-600">Hotel Management</p>
         </div>
 
         <div className="bg-white rounded-lg border border-slate-200 shadow-lg p-8">
           <h2 className="text-2xl font-bold text-slate-900 mb-2">Sign In</h2>
-          <p className="text-slate-600 text-sm mb-6">Enter your credentials to access the dashboard</p>
+          <p className="text-slate-600 text-sm mb-6">
+            Enter your credentials to access the dashboard
+          </p>
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-slate-700 mb-1"
+              >
                 Email
               </label>
               <input
@@ -77,7 +82,10 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-slate-700 mb-1"
+              >
                 Password
               </label>
               <input
@@ -93,7 +101,9 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <div className="p-3 rounded-lg bg-red-50 text-red-800 text-sm">{error}</div>
+              <div className="p-3 rounded-lg bg-red-50 text-red-800 text-sm">
+                {error}
+              </div>
             )}
 
             <button
@@ -101,7 +111,7 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium disabled:bg-slate-400"
             >
-              {loading ? 'Signing in...' : 'Sign In'}
+              {loading ? "Signing in..." : "Sign In"}
             </button>
           </form>
 
@@ -121,12 +131,12 @@ export default function LoginPage() {
         </div>
 
         <div className="text-center mt-6 text-sm text-slate-600">
-          Back to{' '}
+          Back to{" "}
           <Link href="/" className="text-blue-600 hover:underline">
             home
           </Link>
         </div>
       </div>
     </div>
-  )
+  );
 }
