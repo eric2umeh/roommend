@@ -2,10 +2,16 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useAuth } from '@/lib/auth-context'
 import { mockOrganization, mockLocation, mockRooms, mockReservations } from '@/lib/mock-data'
 
 export default function DashboardPage() {
   const [selectedLocation] = useState(mockLocation)
+  const { hasPermission } = useAuth()
+
+  // Only show revenue/booking data to managers and admins
+  const canViewFinancials = hasPermission('view_reports') || hasPermission('manage_reservations')
+  const canViewReservations = hasPermission('manage_reservations') || hasPermission('check_in_guests')
 
   const roomStats = {
     total: mockRooms.length,
@@ -34,11 +40,13 @@ export default function DashboardPage() {
           <p className="text-xs text-slate-500 mt-2">{roomStats.occupied} of {roomStats.total} rooms</p>
         </div>
 
-        <div className="bg-white rounded-lg border border-slate-200 p-6">
-          <div className="text-sm text-slate-600 mb-2">Today's Revenue</div>
-          <div className="text-3xl font-bold text-slate-900">₦165,000</div>
-          <p className="text-xs text-slate-500 mt-2">From {mockReservations.length} active reservations</p>
-        </div>
+        {canViewFinancials && (
+          <div className="bg-white rounded-lg border border-slate-200 p-6">
+            <div className="text-sm text-slate-600 mb-2">Today's Revenue</div>
+            <div className="text-3xl font-bold text-slate-900">₦165,000</div>
+            <p className="text-xs text-slate-500 mt-2">From {mockReservations.length} active reservations</p>
+          </div>
+        )}
 
         <div className="bg-white rounded-lg border border-slate-200 p-6">
           <div className="text-sm text-slate-600 mb-2">Pending Tasks</div>
@@ -46,11 +54,13 @@ export default function DashboardPage() {
           <p className="text-xs text-slate-500 mt-2">Housekeeping items</p>
         </div>
 
-        <div className="bg-white rounded-lg border border-slate-200 p-6">
-          <div className="text-sm text-slate-600 mb-2">Active Guests</div>
-          <div className="text-3xl font-bold text-slate-900">{mockReservations.length}</div>
-          <p className="text-xs text-slate-500 mt-2">Currently checked in</p>
-        </div>
+        {canViewReservations && (
+          <div className="bg-white rounded-lg border border-slate-200 p-6">
+            <div className="text-sm text-slate-600 mb-2">Active Guests</div>
+            <div className="text-3xl font-bold text-slate-900">{mockReservations.length}</div>
+            <p className="text-xs text-slate-500 mt-2">Currently checked in</p>
+          </div>
+        )}
       </div>
 
       {/* Room Status Overview & Quick Actions */}
@@ -109,30 +119,32 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Recent Reservations */}
-      <div className="bg-white rounded-lg border border-slate-200 p-6">
-        <h2 className="text-xl font-bold text-slate-900 mb-4">Recent Reservations</h2>
-        <div className="space-y-4">
-          {mockReservations.map((res) => (
-            <div key={res.id} className="flex items-center justify-between p-4 rounded-lg border border-slate-200 hover:bg-slate-50">
-              <div className="flex-1">
-                <div className="font-medium text-slate-900">Room {res.room_id}</div>
-                <div className="text-sm text-slate-600">{res.check_in_date} to {res.check_out_date}</div>
+      {/* Recent Reservations - Only for authorized staff */}
+      {canViewReservations && (
+        <div className="bg-white rounded-lg border border-slate-200 p-6">
+          <h2 className="text-xl font-bold text-slate-900 mb-4">Recent Reservations</h2>
+          <div className="space-y-4">
+            {mockReservations.map((res) => (
+              <div key={res.id} className="flex items-center justify-between p-4 rounded-lg border border-slate-200 hover:bg-slate-50">
+                <div className="flex-1">
+                  <div className="font-medium text-slate-900">Room {res.room_id}</div>
+                  <div className="text-sm text-slate-600">{res.check_in_date} to {res.check_out_date}</div>
+                </div>
+                <div className="text-right">
+                  <div className="font-medium text-slate-900">₦{res.total_price_naira.toLocaleString()}</div>
+                  <span className={`text-xs px-2 py-1 rounded font-medium capitalize ${
+                    res.status === 'checked_in' ? 'bg-blue-100 text-blue-800' :
+                    res.status === 'confirmed' ? 'bg-green-100 text-green-800' :
+                    'bg-slate-100 text-slate-800'
+                  }`}>
+                    {res.status}
+                  </span>
+                </div>
               </div>
-              <div className="text-right">
-                <div className="font-medium text-slate-900">₦{res.total_price_naira.toLocaleString()}</div>
-                <span className={`text-xs px-2 py-1 rounded font-medium capitalize ${
-                  res.status === 'checked_in' ? 'bg-blue-100 text-blue-800' :
-                  res.status === 'confirmed' ? 'bg-green-100 text-green-800' :
-                  'bg-slate-100 text-slate-800'
-                }`}>
-                  {res.status}
-                </span>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }
