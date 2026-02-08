@@ -135,58 +135,85 @@ export function DataTable<T extends Record<string, any>>({
         )}
       </div>
 
-      {/* Table - Desktop */}
-      <div className="hidden md:block overflow-x-auto border border-slate-200 rounded-lg">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-slate-50 border-b border-slate-200">
-              {columns.map((col) => (
-                <th
-                  key={String(col.key)}
-                  className={`px-6 py-3 text-left font-medium text-slate-700 ${
-                    col.sortable ? 'cursor-pointer hover:bg-slate-100' : ''
-                  } ${col.className || ''}`}
-                  onClick={() => col.sortable && handleSort(col.key)}
-                >
-                  <div className="flex items-center gap-2">
-                    {col.label}
-                    {col.sortable && sortKey === col.key && (
-                      <span className="text-xs">{sortOrder === 'asc' ? '▲' : '▼'}</span>
-                    )}
-                  </div>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedData.map((row, idx) => (
-              <tr key={idx} className="border-b border-slate-200 hover:bg-slate-50">
-                {columns.map((col) => (
-                  <td key={String(col.key)} className={`px-6 py-4 text-slate-900 ${col.className || ''}`}>
-                    {col.render ? col.render(row[col.key], row) : row[col.key]}
-                  </td>
+      {/* No Results */}
+      {sortedData.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-12 text-center">
+          <div className="text-5xl mb-4">🔍</div>
+          <h3 className="text-lg font-semibold text-slate-900 mb-2">No Results Found</h3>
+          <p className="text-slate-600 mb-4">
+            {searchTerm || Object.keys(activeFilters).some((k) => activeFilters[k])
+              ? 'Try adjusting your search or filter criteria'
+              : 'No data available'}
+          </p>
+          {(searchTerm || Object.keys(activeFilters).some((k) => activeFilters[k])) && (
+            <button
+              onClick={() => {
+                setSearchTerm('')
+                setActiveFilters({})
+                setCurrentPage(1)
+              }}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
+            >
+              Clear Filters
+            </button>
+          )}
+        </div>
+      ) : (
+        <>
+          {/* Table - Desktop */}
+          <div className="hidden md:block overflow-x-auto border border-slate-200 rounded-lg">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-slate-50 border-b border-slate-200">
+                  {columns.map((col) => (
+                    <th
+                      key={String(col.key)}
+                      className={`px-6 py-3 text-left font-medium text-slate-700 ${
+                        col.sortable ? 'cursor-pointer hover:bg-slate-100' : ''
+                      } ${col.className || ''}`}
+                      onClick={() => col.sortable && handleSort(col.key)}
+                    >
+                      <div className="flex items-center gap-2">
+                        {col.label}
+                        {col.sortable && sortKey === col.key && (
+                          <span className="text-xs">{sortOrder === 'asc' ? '▲' : '▼'}</span>
+                        )}
+                      </div>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {paginatedData.map((row, idx) => (
+                  <tr key={idx} className="border-b border-slate-200 hover:bg-slate-50">
+                    {columns.map((col) => (
+                      <td key={String(col.key)} className={`px-6 py-4 text-slate-900 ${col.className || ''}`}>
+                        {col.render ? col.render(row[col.key], row) : row[col.key]}
+                      </td>
+                    ))}
+                  </tr>
                 ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+              </tbody>
+            </table>
+          </div>
 
-      {/* Cards - Mobile */}
-      <div className="md:hidden space-y-3">
-        {paginatedData.map((row, idx) => (
-          <div key={idx} className="bg-white border border-slate-200 rounded-lg p-4 space-y-2">
-            {columns.map((col) => (
-              <div key={String(col.key)} className="flex justify-between text-sm">
-                <span className="font-medium text-slate-600">{col.label}:</span>
-                <span className="text-slate-900">
-                  {col.render ? col.render(row[col.key], row) : row[col.key]}
-                </span>
+          {/* Cards - Mobile */}
+          <div className="md:hidden space-y-3">
+            {paginatedData.map((row, idx) => (
+              <div key={idx} className="bg-white border border-slate-200 rounded-lg p-4 space-y-2">
+                {columns.map((col) => (
+                  <div key={String(col.key)} className="flex justify-between text-sm">
+                    <span className="font-medium text-slate-600">{col.label}:</span>
+                    <span className="text-slate-900">
+                      {col.render ? col.render(row[col.key], row) : row[col.key]}
+                    </span>
+                  </div>
+                ))}
               </div>
             ))}
           </div>
-        ))}
-      </div>
+        </>
+      )}
 
       {/* Pagination */}
       {totalPages > 1 && (

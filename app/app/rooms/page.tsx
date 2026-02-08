@@ -76,6 +76,12 @@ export default function RoomsPage() {
     value: String(i),
   }))
 
+  const priceOptions = [
+    { label: 'Budget (₦82,500)', value: '82500' },
+    { label: 'Mid-Range (₦165,000)', value: '165000' },
+    { label: 'Luxury (₦330,000)', value: '330000' },
+  ]
+
   const filters = [
     {
       label: 'Filter by Floor',
@@ -91,6 +97,11 @@ export default function RoomsPage() {
         { label: 'Occupied', value: 'occupied' },
         { label: 'Maintenance', value: 'maintenance' },
       ],
+    },
+    {
+      label: 'Filter by Price',
+      key: 'base_price_naira',
+      options: priceOptions,
     },
   ]
 

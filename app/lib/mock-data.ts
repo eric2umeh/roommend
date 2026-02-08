@@ -218,68 +218,77 @@ export const mockRoomTypes: RoomType[] = [
   },
 ]
 
-// Mock Rooms
+// Mock Rooms - 35+ rooms for testing pagination
 export const mockRooms: Room[] = [
-  {
-    id: 'room_101',
+  // Ground Floor (Floor 0) - Standard Rooms
+  ...Array.from({ length: 8 }, (_, i) => ({
+    id: `room_0${(i + 1).toString().padStart(2, '0')}`,
     location_id: 'loc_grand_bohabs_main',
     room_type_id: 'rt_standard_001',
-    room_number: '101',
-    floor: 1,
-    status: 'clean',
-    notes: 'Recently renovated',
+    room_number: `G${(i + 1).toString().padStart(2, '0')}`,
+    floor: 0,
+    status: ['clean', 'dirty', 'occupied', 'maintenance'][i % 4] as any,
+    notes: i % 3 === 0 ? 'Recently renovated' : i % 5 === 0 ? 'Needs maintenance' : '',
     is_active: true,
     created_at: '2024-01-15T10:00:00Z',
     updated_at: '2024-01-15T10:00:00Z',
-  },
-  {
-    id: 'room_102',
+  })),
+
+  // First Floor (Floor 1) - Standard Rooms
+  ...Array.from({ length: 10 }, (_, i) => ({
+    id: `room_1${(i + 1).toString().padStart(2, '0')}`,
     location_id: 'loc_grand_bohabs_main',
     room_type_id: 'rt_standard_001',
-    room_number: '102',
+    room_number: `1${(i + 1).toString().padStart(2, '0')}`,
     floor: 1,
-    status: 'occupied',
-    notes: '',
+    status: ['clean', 'dirty', 'occupied', 'maintenance'][i % 4] as any,
+    notes: i % 4 === 0 ? 'City view' : i % 6 === 0 ? 'Under maintenance' : '',
     is_active: true,
     created_at: '2024-01-15T10:00:00Z',
     updated_at: '2024-01-15T10:00:00Z',
-  },
-  {
-    id: 'room_201',
+  })),
+
+  // Second Floor (Floor 2) - Deluxe Rooms
+  ...Array.from({ length: 8 }, (_, i) => ({
+    id: `room_2${(i + 1).toString().padStart(2, '0')}`,
     location_id: 'loc_grand_bohabs_main',
     room_type_id: 'rt_deluxe_001',
-    room_number: '201',
+    room_number: `2${(i + 1).toString().padStart(2, '0')}`,
     floor: 2,
-    status: 'clean',
-    notes: '',
+    status: ['clean', 'dirty', 'occupied', 'maintenance'][(i + 1) % 4] as any,
+    notes: i % 3 === 0 ? 'Pool view' : '',
     is_active: true,
     created_at: '2024-01-15T10:00:00Z',
     updated_at: '2024-01-15T10:00:00Z',
-  },
-  {
-    id: 'room_202',
-    location_id: 'loc_grand_bohabs_main',
-    room_type_id: 'rt_deluxe_001',
-    room_number: '202',
-    floor: 2,
-    status: 'dirty',
-    notes: 'Needs cleaning',
-    is_active: true,
-    created_at: '2024-01-15T10:00:00Z',
-    updated_at: '2024-01-15T10:00:00Z',
-  },
-  {
-    id: 'room_301',
+  })),
+
+  // Third Floor (Floor 3) - Executive Suites
+  ...Array.from({ length: 5 }, (_, i) => ({
+    id: `room_3${(i + 1).toString().padStart(2, '0')}`,
     location_id: 'loc_grand_bohabs_main',
     room_type_id: 'rt_suite_001',
-    room_number: '301',
+    room_number: `3${(i + 1).toString().padStart(2, '0')}`,
     floor: 3,
-    status: 'occupied',
-    notes: 'VIP Guest',
+    status: ['clean', 'occupied'][i % 2] as any,
+    notes: i === 0 ? 'VIP Guest' : i === 2 ? 'Presidential Suite' : '',
     is_active: true,
     created_at: '2024-01-15T10:00:00Z',
     updated_at: '2024-01-15T10:00:00Z',
-  },
+  })),
+
+  // Additional Standard Rooms
+  ...Array.from({ length: 4 }, (_, i) => ({
+    id: `room_4${(i + 1).toString().padStart(2, '0')}`,
+    location_id: 'loc_grand_bohabs_main',
+    room_type_id: 'rt_standard_001',
+    room_number: `4${(i + 1).toString().padStart(2, '0')}`,
+    floor: 1,
+    status: ['clean', 'maintenance'][i % 2] as any,
+    notes: '',
+    is_active: true,
+    created_at: '2024-01-15T10:00:00Z',
+    updated_at: '2024-01-15T10:00:00Z',
+  })),
 ]
 
 // Mock Guests
