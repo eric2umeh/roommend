@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { mockRooms, mockRoomTypes } from '@/lib/mock-data'
 import { DataTable, type Column } from '@/components/data-table'
 
@@ -18,9 +19,11 @@ interface RoomWithType {
   notes?: string
   type_name?: string
   base_price_naira?: number
+  room_type_id?: string
 }
 
 export default function RoomsPage() {
+  const [selectedRoom, setSelectedRoom] = useState<RoomWithType | null>(null)
   // Enrich rooms with type info
   const enrichedRooms: RoomWithType[] = mockRooms.map((room) => {
     const type = mockRoomTypes.find((t) => t.id === (room as any).room_type_id)
@@ -133,8 +136,76 @@ export default function RoomsPage() {
           itemsPerPage={20}
           searchPlaceholder="Search by room number..."
           filters={filters}
+          onView={(room) => setSelectedRoom(room)}
+          viewButtonText="View"
         />
       </div>
+
+      {/* Room Details Modal */}
+      {selectedRoom && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-lg max-w-md w-full max-h-96 overflow-y-auto">
+            <div className="bg-slate-50 border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-slate-900">Room {selectedRoom.room_number}</h2>
+              <button
+                onClick={() => setSelectedRoom(null)}
+                className="text-slate-500 hover:text-slate-700 text-2xl leading-none"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="text-sm font-medium text-slate-700">Room Type</label>
+                <p className="text-slate-900">{selectedRoom.type_name}</p>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-slate-700">Floor</label>
+                <p className="text-slate-900">Floor {selectedRoom.floor}</p>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-slate-700">Price per Night</label>
+                <p className="text-slate-900 text-lg font-semibold text-blue-600">
+                  ₦{selectedRoom.base_price_naira?.toLocaleString()}
+                </p>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-slate-700">Status</label>
+                <span
+                  className={`inline-block text-xs px-3 py-1 rounded-full font-medium capitalize mt-1 ${
+                    statusColors[selectedRoom.status]
+                  }`}
+                >
+                  {selectedRoom.status}
+                </span>
+              </div>
+
+              {selectedRoom.notes && (
+                <div>
+                  <label className="text-sm font-medium text-slate-700">Notes</label>
+                  <p className="text-slate-900">{selectedRoom.notes}</p>
+                </div>
+              )}
+
+              <div className="pt-4 border-t border-slate-200 flex gap-2">
+                <button
+                  onClick={() => setSelectedRoom(null)}
+                  className="flex-1 px-4 py-2 bg-slate-200 text-slate-900 rounded-lg hover:bg-slate-300 font-medium"
+                >
+                  Close
+                </button>
+                <button className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">
+                  Edit Room
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
