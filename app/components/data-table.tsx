@@ -21,6 +21,8 @@ export interface DataTableProps<T extends Record<string, any>> {
     key: string
     options: { label: string; value: string }[]
   }[]
+  onView?: (row: T) => void
+  viewButtonText?: string
 }
 
 export function DataTable<T extends Record<string, any>>({
@@ -29,6 +31,8 @@ export function DataTable<T extends Record<string, any>>({
   itemsPerPage = 20,
   searchPlaceholder = 'Search...',
   filters = [],
+  onView,
+  viewButtonText = 'View',
 }: DataTableProps<T>) {
   const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState('')
@@ -181,6 +185,9 @@ export function DataTable<T extends Record<string, any>>({
                       </div>
                     </th>
                   ))}
+                  {onView && (
+                    <th className="px-6 py-3 text-left font-medium text-slate-700">Action</th>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -191,26 +198,71 @@ export function DataTable<T extends Record<string, any>>({
                         {col.render ? col.render(row[col.key], row) : row[col.key]}
                       </td>
                     ))}
+                    {onView && (
+                      <td className="px-6 py-4">
+                        <button
+                          onClick={() => onView(row)}
+                          className="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                        >
+                          {viewButtonText}
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
 
-          {/* Cards - Mobile */}
-          <div className="md:hidden space-y-3">
-            {paginatedData.map((row, idx) => (
-              <div key={idx} className="bg-white border border-slate-200 rounded-lg p-4 space-y-2">
+          {/* Horizontal Scroll Rows - Mobile */}
+          <div className="md:hidden overflow-x-auto border border-slate-200 rounded-lg">
+            <div className="flex flex-col">
+              {/* Header Row */}
+              <div className="flex gap-4 bg-slate-50 border-b border-slate-200 min-w-full">
                 {columns.map((col) => (
-                  <div key={String(col.key)} className="flex justify-between text-sm">
-                    <span className="font-medium text-slate-600">{col.label}:</span>
-                    <span className="text-slate-900">
-                      {col.render ? col.render(row[col.key], row) : row[col.key]}
-                    </span>
+                  <div
+                    key={String(col.key)}
+                    className="px-4 py-3 font-medium text-slate-700 whitespace-nowrap text-sm flex-shrink-0"
+                    style={{ minWidth: '120px' }}
+                  >
+                    {col.label}
                   </div>
                 ))}
+                <div className="px-4 py-3 font-medium text-slate-700 whitespace-nowrap text-sm flex-shrink-0" style={{ minWidth: '80px' }}>
+                  Action
+                </div>
               </div>
-            ))}
+
+              {/* Data Rows */}
+              {paginatedData.map((row, idx) => (
+                <div
+                  key={idx}
+                  className="flex gap-4 border-b border-slate-200 hover:bg-slate-50 bg-white min-w-full"
+                >
+                  {columns.map((col) => (
+                    <div
+                      key={String(col.key)}
+                      className="px-4 py-3 text-slate-900 whitespace-nowrap text-sm flex-shrink-0"
+                      style={{ minWidth: '120px' }}
+                    >
+                      <div className="truncate">
+                        {col.render ? col.render(row[col.key], row) : String(row[col.key])}
+                      </div>
+                    </div>
+                  ))}
+                  {onView && (
+                    <div className="px-4 py-3 flex-shrink-0" style={{ minWidth: '80px' }}>
+                      <button
+                        onClick={() => onView(row)}
+                        className="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 whitespace-nowrap"
+                      >
+                        {viewButtonText}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </>
       )}
