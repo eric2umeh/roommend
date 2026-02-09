@@ -239,9 +239,8 @@ Currently supports:
 
 ## 📞 Contact
 
-- **Email** - eric@roommend.app
-- **Twitter** - [@roommend_app](https://twitter.com/roommend_app)
-- **Website** - [roommend.app](https://roommend.app)
+- **Email** - eric2umeh@yahoo.com
+- **Website** - [roommend.app](https://v0-roommend-saa-s-webapp.vercel.app/app)
 
 ---
 
