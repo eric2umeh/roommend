@@ -47,7 +47,6 @@ export const metadata: Metadata = {
     title: 'Roommend - Hotel Management',
     description: 'Modern hotel and restaurant management system',
   },
-    generator: 'v0.app'
 }
 
 export const viewport: Viewport = {
