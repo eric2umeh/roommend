@@ -138,6 +138,7 @@ export default function RoomsPage() {
           filters={filters}
           onView={(room) => setSelectedRoom(room)}
           viewButtonText="View"
+          mobileColumns={['room_number', 'base_price_naira', 'status']}
         />
       </div>
 
