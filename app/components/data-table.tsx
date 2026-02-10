@@ -133,8 +133,8 @@ export function DataTable<T extends Record<string, any>>({
           />
         </div>
 
-        {/* View Mode Toggle - Desktop Only */}
-        <div className="hidden md:flex gap-2">
+        {/* View Mode Toggle - Desktop and Mobile */}
+        <div className="flex gap-2">
           <button
             onClick={() => setViewMode('table')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
@@ -160,7 +160,7 @@ export function DataTable<T extends Record<string, any>>({
 
       {/* Desktop Filters */}
       {filters.length > 0 && (
-        <div className="hidden md:flex gap-2 flex-wrap">
+        <div className="hidden md:flex gap-3 items-center justify-between flex-wrap">
           {filters.map((filter) => (
             <select
               key={filter.key}
@@ -179,6 +179,32 @@ export function DataTable<T extends Record<string, any>>({
         </div>
       )}
 
+      {/* Mobile Card View */}
+      {viewMode === 'card' && (
+        <div className="md:hidden space-y-3">
+          {paginatedData.map((row, idx) => (
+            <div key={idx} className="bg-white border border-slate-200 rounded-lg p-4 space-y-2">
+              {mobileDisplayColumns.map((col) => (
+                <div key={String(col.key)} className="flex justify-between text-sm">
+                  <span className="font-medium text-slate-600">{col.label}:</span>
+                  <span className="text-slate-900">
+                    {col.render ? col.render(row[col.key], row) : String(row[col.key])}
+                  </span>
+                </div>
+              ))}
+              {onView && (
+                <button
+                  onClick={() => onView(row)}
+                  className="w-full mt-3 px-3 py-2 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
+                >
+                  {viewButtonText}
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Mobile Filters Toggle */}
       {filters.length > 0 && (
         <div className="md:hidden">
@@ -187,7 +213,7 @@ export function DataTable<T extends Record<string, any>>({
             className="w-full flex items-center justify-between px-4 py-2 bg-slate-100 rounded-lg border border-slate-300 hover:bg-slate-200"
           >
             <span className="font-medium text-slate-900">Filters {hasActiveFilters && '(Active)'}</span>
-            <span className="text-lg">{showFilters ? '▼' : '▶'}</span>
+            <span className="text-sm font-medium">{showFilters ? 'Hide' : 'Show More'}</span>
           </button>
 
           {/* Collapsible Filters */}
@@ -318,50 +344,51 @@ export function DataTable<T extends Record<string, any>>({
             </div>
           )}
 
-          {/* Mobile Compact Table */}
-          <div className="md:hidden border border-slate-200 rounded-lg overflow-hidden">
-            <div className="bg-slate-50 border-b border-slate-200">
-              <div className="flex">
-                {mobileDisplayColumns.map((col) => (
-                  <div
-                    key={String(col.key)}
-                    className="flex-1 px-3 py-2 font-medium text-slate-700 text-xs border-r border-slate-200 last:border-r-0"
-                  >
-                    {col.label}
-                  </div>
-                ))}
-                <div className="w-16 px-3 py-2 font-medium text-slate-700 text-xs">Action</div>
-              </div>
-            </div>
-
-            <div>
-              {paginatedData.map((row, idx) => (
-                <div key={idx} className="flex border-b border-slate-200 hover:bg-slate-50 last:border-b-0">
+          {/* Mobile Compact Table - Only in Table View */}
+          {viewMode === 'table' && (
+            <div className="md:hidden border border-slate-200 rounded-lg overflow-hidden">
+              <div className="bg-slate-50 border-b border-slate-200">
+                <div className="flex">
                   {mobileDisplayColumns.map((col) => (
                     <div
                       key={String(col.key)}
-                      className="flex-1 px-3 py-3 text-slate-900 text-xs border-r border-slate-200 last:border-r-0 break-words"
+                      className="flex-1 px-3 py-2 font-medium text-slate-700 text-xs border-r border-slate-200 last:border-r-0"
                     >
-                      <div className="font-medium text-slate-600 text-xs mb-1">{col.label}</div>
-                      <div className="line-clamp-2">
-                        {col.render ? col.render(row[col.key], row) : String(row[col.key])}
-                      </div>
+                      {col.label}
                     </div>
                   ))}
-                  {onView && (
-                    <div className="w-16 px-2 py-3 flex items-center justify-center">
-                      <button
-                        onClick={() => onView(row)}
-                        className="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 whitespace-nowrap"
-                      >
-                        {viewButtonText}
-                      </button>
-                    </div>
-                  )}
+                  <div className="w-16 px-3 py-2 font-medium text-slate-700 text-xs">Action</div>
                 </div>
-              ))}
+              </div>
+
+              <div>
+                {paginatedData.map((row, idx) => (
+                  <div key={idx} className="flex border-b border-slate-200 hover:bg-slate-50 last:border-b-0">
+                    {mobileDisplayColumns.map((col) => (
+                      <div
+                        key={String(col.key)}
+                        className="flex-1 px-3 py-3 text-slate-900 text-xs border-r border-slate-200 last:border-r-0 break-words flex items-center"
+                      >
+                        <div className="line-clamp-2">
+                          {col.render ? col.render(row[col.key], row) : String(row[col.key])}
+                        </div>
+                      </div>
+                    ))}
+                    {onView && (
+                      <div className="w-16 px-2 py-3 flex items-center justify-center">
+                        <button
+                          onClick={() => onView(row)}
+                          className="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 whitespace-nowrap"
+                        >
+                          {viewButtonText}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </>
       )}
 
