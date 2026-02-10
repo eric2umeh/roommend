@@ -79,6 +79,7 @@ export default function GuestsPage() {
           columns={columns}
           itemsPerPage={20}
           searchPlaceholder="Search by name, email, or phone..."
+          mobileColumns={['first_name', 'email', 'total_stays']}
         />
       </div>
     </div>
