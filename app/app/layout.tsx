@@ -7,16 +7,44 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '@/lib/auth-context'
 
 const SIDEBAR_MENU = [
+  // Core Operations
   { label: 'Dashboard', href: '/app', icon: '📊', permissions: [] },
   { label: 'Reservations', href: '/app/reservations', icon: '📅', permissions: ['manage_reservations'] },
   { label: 'Rooms', href: '/app/rooms', icon: '🏨', permissions: ['manage_rooms'] },
   { label: 'Guests', href: '/app/guests', icon: '👥', permissions: ['view_guests'] },
-  { label: 'Restaurant', href: '/app/orders', icon: '🍽️', permissions: ['manage_orders'] },
+  
+  // Restaurant & Food Service
+  { label: 'Restaurant Orders', href: '/app/orders', icon: '🍽️', permissions: ['manage_orders'] },
+  { label: 'Menu', href: '/app/menu', icon: '📋', permissions: ['manage_menu'] },
+  
+  // Inventory & Supplies
   { label: 'Inventory', href: '/app/inventory', icon: '📦', permissions: ['manage_inventory'] },
+  { label: 'Suppliers', href: '/app/suppliers', icon: '🚚', permissions: ['manage_suppliers'] },
+  
+  // Housekeeping & Maintenance
   { label: 'Housekeeping', href: '/app/housekeeping', icon: '🧹', permissions: ['manage_tasks'] },
+  { label: 'Maintenance', href: '/app/maintenance', icon: '🔧', permissions: ['manage_maintenance'] },
+  
+  // Human Resources
   { label: 'Staff', href: '/app/staff', icon: '👨‍💼', permissions: ['manage_staff'] },
+  { label: 'Payroll', href: '/app/payroll', icon: '💰', permissions: ['manage_payroll'] },
+  { label: 'Attendance', href: '/app/attendance', icon: '📍', permissions: ['manage_attendance'] },
+  
+  // Finance & Accounting
+  { label: 'Accounting', href: '/app/accounting', icon: '💳', permissions: ['manage_accounting'] },
+  { label: 'Billing', href: '/app/billing', icon: '🧾', permissions: ['manage_billing'] },
+  
+  // Marketing & Organizations
+  { label: 'Marketing', href: '/app/marketing', icon: '📢', permissions: ['manage_marketing'] },
+  { label: 'Organizations', href: '/app/organizations', icon: '🏢', permissions: ['manage_organizations'] },
+  
+  // Analytics & Reports
   { label: 'Reports', href: '/app/reports', icon: '📈', permissions: ['view_reports'] },
+  { label: 'Analytics', href: '/app/analytics', icon: '📉', permissions: ['view_analytics'] },
+  
+  // Admin
   { label: 'Settings', href: '/app/settings', icon: '⚙️', permissions: ['access_settings'] },
+  { label: 'Roles & Permissions', href: '/app/settings/roles', icon: '🔐', permissions: ['manage_roles'] },
 ]
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
