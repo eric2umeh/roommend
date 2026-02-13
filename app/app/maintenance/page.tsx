@@ -28,6 +28,27 @@ export default function MaintenancePage() {
     { key: 'date', label: 'Date' },
   ]
 
+  const filters = [
+    {
+      key: 'priority',
+      label: 'Priority',
+      options: [
+        { value: 'high', label: 'High' },
+        { value: 'medium', label: 'Medium' },
+        { value: 'low', label: 'Low' },
+      ],
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      options: [
+        { value: 'pending', label: 'Pending' },
+        { value: 'in_progress', label: 'In Progress' },
+        { value: 'completed', label: 'Completed' },
+      ],
+    },
+  ]
+
   return (
     <div className="space-y-6">
       <div>
@@ -35,7 +56,7 @@ export default function MaintenancePage() {
         <p className="text-slate-600 mt-2">Track and manage facility maintenance</p>
       </div>
       <div className="bg-white rounded-lg border border-slate-200 p-6">
-        <DataTable data={mockRequests} columns={columns} itemsPerPage={10} searchPlaceholder="Search requests..." mobileColumns={['room', 'issue', 'status']} />
+        <DataTable data={mockRequests} columns={columns} itemsPerPage={10} searchPlaceholder="Search requests..." filters={filters} mobileColumns={['room', 'issue', 'status']} />
       </div>
     </div>
   )

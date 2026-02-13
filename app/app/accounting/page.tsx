@@ -29,6 +29,25 @@ export default function AccountingPage() {
     { key: 'status', label: 'Status', render: (v) => <span className={`px-2 py-1 rounded text-xs ${v === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>{v}</span> },
   ]
 
+  const filters = [
+    {
+      key: 'type',
+      label: 'Type',
+      options: [
+        { value: 'income', label: 'Income' },
+        { value: 'expense', label: 'Expense' },
+      ],
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      options: [
+        { value: 'completed', label: 'Completed' },
+        { value: 'pending', label: 'Pending' },
+      ],
+    },
+  ]
+
   return (
     <div className="space-y-6">
       <div>
@@ -36,7 +55,7 @@ export default function AccountingPage() {
         <p className="text-slate-600 mt-2">Track financial transactions and reports</p>
       </div>
       <div className="bg-white rounded-lg border border-slate-200 p-6">
-        <DataTable data={mockTransactions} columns={columns} itemsPerPage={10} searchPlaceholder="Search transactions..." mobileColumns={['date', 'description', 'amount']} />
+        <DataTable data={mockTransactions} columns={columns} itemsPerPage={10} searchPlaceholder="Search transactions..." filters={filters} mobileColumns={['date', 'description', 'amount']} />
       </div>
     </div>
   )
