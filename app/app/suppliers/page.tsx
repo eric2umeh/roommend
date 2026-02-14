@@ -29,6 +29,27 @@ export default function SuppliersPage() {
     { key: 'status', label: 'Status', render: (v) => <span className={`px-2 py-1 rounded text-xs ${v === 'active' ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-800'}`}>{v === 'active' ? 'Active' : 'Inactive'}</span> },
   ]
 
+  const filters = [
+    {
+      key: 'category',
+      label: 'Category',
+      options: [
+        { value: 'Food & Beverages', label: 'Food & Beverages' },
+        { value: 'Linens & Textiles', label: 'Linens & Textiles' },
+        { value: 'Cleaning', label: 'Cleaning' },
+        { value: 'Equipment', label: 'Equipment' },
+      ],
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      options: [
+        { value: 'active', label: 'Active' },
+        { value: 'inactive', label: 'Inactive' },
+      ],
+    },
+  ]
+
   return (
     <div className="space-y-6">
       <div>
@@ -36,7 +57,7 @@ export default function SuppliersPage() {
         <p className="text-slate-600 mt-2">Manage your supplier relationships and orders</p>
       </div>
       <div className="bg-white rounded-lg border border-slate-200 p-6">
-        <DataTable data={mockSuppliers} columns={columns} itemsPerPage={10} searchPlaceholder="Search suppliers..." mobileColumns={['name', 'category', 'status']} />
+        <DataTable data={mockSuppliers} columns={columns} itemsPerPage={10} searchPlaceholder="Search suppliers..." filters={filters} mobileColumns={['name', 'category', 'status']} />
       </div>
     </div>
   )
