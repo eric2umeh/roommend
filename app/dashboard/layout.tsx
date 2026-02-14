@@ -9,13 +9,11 @@ import { useAuth } from '@/lib/auth-context'
 const SIDEBAR_MENU = [
   // Core Operations
   { label: 'Dashboard', href: '/dashboard', icon: '📊', permissions: [] },
-  { label: 'Reservations', href: '/dashboard/reservations', icon: '📅', permissions: ['manage_reservations'] },
-  { label: 'Rooms', href: '/dashboard/rooms', icon: '🏨', permissions: ['manage_rooms'] },
-  { label: 'Guests', href: '/dashboard/guests', icon: '👥', permissions: ['view_guests'] },
+  { label: 'Front Desk', href: '/dashboard/front-desk', icon: '🏨', permissions: ['manage_reservations', 'view_guests'] },
+  { label: 'Rooms', href: '/dashboard/rooms', icon: '🛏️', permissions: ['manage_rooms'] },
   
   // Restaurant & Food Service
-  { label: 'Restaurant Orders', href: '/dashboard/orders', icon: '🍽️', permissions: ['manage_orders'] },
-  { label: 'Menu', href: '/dashboard/menu', icon: '📋', permissions: ['manage_menu'] },
+  { label: 'Restaurant', href: '/dashboard/restaurant', icon: '🍽️', permissions: ['manage_orders', 'manage_menu'] },
   
   // Inventory & Supplies
   { label: 'Inventory', href: '/dashboard/inventory', icon: '📦', permissions: ['manage_inventory'] },
