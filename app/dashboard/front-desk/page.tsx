@@ -3,10 +3,21 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
-import { mockRooms } from '@/lib/mock-data'
+import { mockRooms, mockRoomTypes } from '@/lib/mock-data'
 
 type ViewMode = 'card' | 'table'
 type SubSection = 'overview' | 'walk-in' | 'reservation' | 'events' | 'out-of-order' | 'city-ledger' | 'guest-database' | 'reports'
+
+interface EnrichedRoom {
+  id: string
+  room_number: string
+  floor: number
+  status: 'clean' | 'dirty' | 'maintenance' | 'occupied'
+  notes?: string
+  room_type: string
+  base_price_naira: number
+  room_type_id: string
+}
 
 export default function FrontDeskPage() {
   const { role, hasPermission } = useAuth()
@@ -29,6 +40,17 @@ export default function FrontDeskPage() {
   const isAdmin = role?.name === 'Admin'
   const isFrontDesk = role?.name === 'Front Desk' || hasPermission('manage_reservations')
 
+  // Enrich rooms with type information
+  const enrichedRooms: EnrichedRoom[] = mockRooms.map((room) => {
+    const type = mockRoomTypes.find((t) => t.id === room.room_type_id)
+    return {
+      ...room,
+      room_type: type?.name || 'Unknown',
+      base_price_naira: type?.base_price_naira || 0,
+      room_type_id: room.room_type_id,
+    }
+  })
+
   // Calculate nights when dates change
   const calculateNights = (arrival: string, departure: string) => {
     if (arrival && departure) {
@@ -39,12 +61,12 @@ export default function FrontDeskPage() {
   }
 
   // Get available and clean rooms
-  const availableRooms = mockRooms.filter(room => 
+  const availableRooms = enrichedRooms.filter(room => 
     room.status === 'clean' && 
     (roomType === '' || room.room_type === roomType)
   )
 
-  const roomTypes = Array.from(new Set(mockRooms.map(r => r.room_type)))
+  const roomTypes = Array.from(new Set(enrichedRooms.map(r => r.room_type)))
 
   const resetModal = () => {
     setShowReservationModal(false)
@@ -63,7 +85,7 @@ export default function FrontDeskPage() {
   const floors = [1, 2, 3, 4]
   const roomsByFloor = floors.map(floor => ({
     floor,
-    rooms: mockRooms.filter(room => room.room_number.startsWith(`${floor}`))
+    rooms: enrichedRooms.filter(room => room.floor === floor)
   }))
 
   const currentFloorRooms = roomsByFloor.find(f => f.floor === selectedFloor)?.rooms || []
@@ -475,49 +497,43 @@ export default function FrontDeskPage() {
                   </label>
                 </div>
 
-                {selectedRoom && (() => {
-                  const selectedRoomData = mockRooms.find(r => r.room_number === selectedRoom)
-                  const basePrice = selectedRoomData?.base_price_naira || 0
-                  const totalPrice = basePrice * nights
-                  
-                  return (
-                    <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
-                      <h3 className="font-semibold text-slate-900 mb-2">Reservation Summary</h3>
-                      <div className="space-y-1 text-sm text-slate-700">
-                        <div className="flex justify-between">
-                          <span>Room:</span>
-                          <span className="font-medium">{selectedRoom}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Check-in:</span>
-                          <span className="font-medium">{arrivalDate}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Check-out:</span>
-                          <span className="font-medium">{departureDate}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Nights:</span>
-                          <span className="font-medium">{nights}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Guests:</span>
-                          <span className="font-medium">{adults} adults, {children} children</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Breakfast:</span>
-                          <span className="font-medium">{breakfastIncluded ? 'Included' : 'Not included'}</span>
-                        </div>
-                        <div className="flex justify-between pt-2 border-t border-slate-300 mt-2">
-                          <span className="font-semibold">Estimated Total:</span>
-                          <span className="font-bold text-lg text-blue-600">
-                            ₦{totalPrice.toLocaleString()}
-                          </span>
-                        </div>
+                {selectedRoom && (
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                    <h3 className="font-semibold text-slate-900 mb-2">Reservation Summary</h3>
+                    <div className="space-y-1 text-sm text-slate-700">
+                      <div className="flex justify-between">
+                        <span>Room:</span>
+                        <span className="font-medium">{selectedRoom}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Check-in:</span>
+                        <span className="font-medium">{arrivalDate}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Check-out:</span>
+                        <span className="font-medium">{departureDate}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Nights:</span>
+                        <span className="font-medium">{nights}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Guests:</span>
+                        <span className="font-medium">{adults} adults, {children} children</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Breakfast:</span>
+                        <span className="font-medium">{breakfastIncluded ? 'Included' : 'Not included'}</span>
+                      </div>
+                      <div className="flex justify-between pt-2 border-t border-slate-300 mt-2">
+                        <span className="font-semibold">Estimated Total:</span>
+                        <span className="font-bold text-lg text-blue-600">
+                          {'₦' + ((enrichedRooms.find(r => r.room_number === selectedRoom)?.base_price_naira || 0) * nights).toLocaleString()}
+                        </span>
                       </div>
                     </div>
-                  )
-                })()}
+                  </div>
+                )}
 
                 <div className="flex justify-between gap-3 pt-4">
                   <button
