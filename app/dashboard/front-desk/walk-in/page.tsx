@@ -56,7 +56,10 @@ const roomTypes = [
 ]
 
 export default function WalkInPage() {
-  const { showToast } = useToast()
+  const { addToast } = useToast()
+  const showToast = (message: string, type: 'success' | 'error' | 'warning' | 'info') => {
+    addToast(message, type)
+  }
   const [step, setStep] = useState(1)
   
   // Step 1: Guest Info
@@ -153,15 +156,15 @@ export default function WalkInPage() {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
+    <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-4 md:space-y-6">
       {/* Back Button */}
       <div className="flex items-center gap-4">
         <Link
           href="/dashboard/front-desk"
-          className="flex items-center gap-2 px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-lg transition"
+          className="inline-flex items-center gap-2 px-3 py-2 md:px-4 md:py-2 text-slate-700 hover:bg-slate-100 rounded-lg transition text-sm md:text-base"
         >
           <span>←</span>
-          <span>Back to Front Desk</span>
+          <span>Back</span>
         </Link>
       </div>
 
@@ -211,15 +214,15 @@ export default function WalkInPage() {
       </div>
 
       {/* Form Content */}
-      <div className="bg-white rounded-lg border border-slate-200 p-6">
+      <div className="bg-white rounded-lg border border-slate-200 p-4 md:p-6">
         {/* Step 1: Guest Info */}
         {step === 1 && (
-          <div className="space-y-6">
-            <h2 className="text-xl font-bold text-slate-900">Guest Information</h2>
+          <div className="space-y-4 md:space-y-6">
+            <h2 className="text-lg md:text-xl font-bold text-slate-900">Guest Information</h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-xs md:text-sm font-medium text-slate-700 mb-1 md:mb-2">
                   Full Name <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -227,13 +230,13 @@ export default function WalkInPage() {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="Enter guest's full name"
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 md:px-4 py-2 md:py-2 text-sm md:text-base border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-xs md:text-sm font-medium text-slate-700 mb-1 md:mb-2">
                   Phone Number <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -241,7 +244,7 @@ export default function WalkInPage() {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="Enter phone number"
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 md:px-4 py-2 md:py-2 text-sm md:text-base border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   required
                 />
               </div>
@@ -515,29 +518,29 @@ export default function WalkInPage() {
         )}
 
         {/* Action Buttons */}
-        <div className="flex justify-between items-center mt-8 pt-6 border-t border-slate-200">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-3 md:gap-0 mt-6 md:mt-8 pt-4 md:pt-6 border-t border-slate-200">
           {step > 1 ? (
             <button
               onClick={() => setStep(step - 1)}
-              className="px-6 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition font-medium"
+              className="w-full md:w-auto px-4 md:px-6 py-2 text-sm md:text-base border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition font-medium"
             >
               Previous
             </button>
           ) : (
-            <div />
+            <div className="hidden md:block" />
           )}
 
           {step < 3 ? (
             <button
               onClick={handleNext}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
+              className="w-full md:w-auto px-4 md:px-6 py-2 text-sm md:text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
             >
               Next
             </button>
           ) : (
             <button
               onClick={handleSubmit}
-              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium"
+              className="w-full md:w-auto px-4 md:px-6 py-2 text-sm md:text-base bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium"
             >
               Complete Booking
             </button>

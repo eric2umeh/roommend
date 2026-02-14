@@ -45,13 +45,13 @@ export default function OutOfOrderPage() {
       </Link>
 
       <div className="flex items-center justify-center min-h-[60vh]">
-      <div className="text-center">
-      <div className="text-6xl mb-4">🔒</div>
+        <div className="text-center">
+          <div className="text-6xl mb-4">🔒</div>
           <h2 className="text-2xl font-bold text-slate-900 mb-2">Access Restricted</h2>
           <p className="text-slate-600">Only administrators can access Out of Order management</p>
         </div>
       </div>
-    )
+    </div>
   }
 
   const columns: Column<OutOfOrderRoom>[] = [

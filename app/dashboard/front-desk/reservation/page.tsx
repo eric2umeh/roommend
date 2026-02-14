@@ -64,8 +64,12 @@ const mockReservations: Reservation[] = [
 
 export default function ReservationPage() {
   const { hasPermission } = useAuth()
-  const { showToast } = useToast()
+  const { addToast } = useToast()
+  const showToast = (message: string, type: 'success' | 'error' | 'warning' | 'info') => {
+    addToast(message, type)
+  }
   const [showCreateForm, setShowCreateForm] = useState(false)
+  const [showModal, setShowModal] = useState(false)
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null)
 
   // Form state

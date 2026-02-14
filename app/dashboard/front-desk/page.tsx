@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
 import { mockRooms, mockRoomTypes } from '@/lib/mock-data'
+import { FrontDeskMobileNav } from '@/components/front-desk-mobile-nav'
 
 type ViewMode = 'card' | 'table'
 type SubSection = 'overview' | 'walk-in' | 'reservation' | 'events' | 'out-of-order' | 'city-ledger' | 'guest-database' | 'reports'
@@ -116,45 +117,20 @@ export default function FrontDeskPage() {
         </button>
       </div>
 
-      {/* Sub-navigation */}
-      <div className="bg-white rounded-lg border border-slate-200 p-2">
-        <div className="flex gap-2 overflow-x-auto">
-          <Link href="/dashboard/front-desk" className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition bg-blue-600 text-white hover:bg-blue-700">
-            <span>📊</span>
-            <span>Overview</span>
-          </Link>
-          <Link href="/dashboard/front-desk/walk-in" className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-slate-700 hover:bg-slate-100">
-            <span>🚶</span>
-            <span>Walk-in</span>
-          </Link>
-          <Link href="/dashboard/front-desk/reservation" className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-slate-700 hover:bg-slate-100">
-            <span>📅</span>
-            <span>Reservation</span>
-          </Link>
-          <Link href="/dashboard/front-desk/events" className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-slate-700 hover:bg-slate-100">
-            <span>🎉</span>
-            <span>Events</span>
-          </Link>
-          {isAdmin && (
-            <Link href="/dashboard/front-desk/out-of-order" className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-slate-700 hover:bg-slate-100">
-              <span>🚫</span>
-              <span>Out of Order</span>
-            </Link>
-          )}
-          <Link href="/dashboard/front-desk/city-ledger" className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-slate-700 hover:bg-slate-100">
-            <span>💼</span>
-            <span>City Ledger</span>
-          </Link>
-          <Link href="/dashboard/front-desk/guest-database" className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-slate-700 hover:bg-slate-100">
-            <span>👥</span>
-            <span>Guests</span>
-          </Link>
-          <Link href="/dashboard/front-desk/reports" className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition text-slate-700 hover:bg-slate-100">
-            <span>📈</span>
-            <span>Reports</span>
-          </Link>
-        </div>
-      </div>
+      {/* Mobile-responsive Sub-navigation */}
+      <FrontDeskMobileNav
+        tabs={[
+          { id: 'overview', label: 'Overview', icon: '📊', href: '/dashboard/front-desk' },
+          { id: 'walk-in', label: 'Walk-in', icon: '🚶', href: '/dashboard/front-desk/walk-in' },
+          { id: 'reservation', label: 'Reservation', icon: '📅', href: '/dashboard/front-desk/reservation' },
+          { id: 'events', label: 'Events', icon: '🎉', href: '/dashboard/front-desk/events' },
+          { id: 'out-of-order', label: 'Out of Order', icon: '🚫', href: '/dashboard/front-desk/out-of-order', adminOnly: true },
+          { id: 'city-ledger', label: 'City Ledger', icon: '💼', href: '/dashboard/front-desk/city-ledger' },
+          { id: 'guest-database', label: 'Guests', icon: '👥', href: '/dashboard/front-desk/guest-database' },
+          { id: 'reports', label: 'Reports', icon: '📈', href: '/dashboard/front-desk/reports' },
+        ]}
+        isAdmin={isAdmin}
+      />
 
       {/* Content */}
       <div className="space-y-6">
