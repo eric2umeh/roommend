@@ -506,7 +506,7 @@ export default function FrontDeskPage() {
                       <div className="flex justify-between pt-2 border-t border-slate-300 mt-2">
                         <span className="font-semibold">Estimated Total:</span>
                         <span className="font-bold text-lg text-blue-600">
-                          ₦{(mockRooms.find(r => r.room_number === selectedRoom)?.base_price_naira || 0) * nights).toLocaleString()}
+                          {'₦' + ((mockRooms.find(r => r.room_number === selectedRoom)?.base_price_naira || 0) * nights).toLocaleString()}
                         </span>
                       </div>
                     </div>
