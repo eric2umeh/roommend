@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { DataTable, type Column } from '@/app/components/data-table'
+import { DataTable, type Column } from '@/components/data-table'
 import { mockGuests } from '@/lib/mock-data'
 
 export default function GuestDatabasePage() {
