@@ -77,7 +77,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
-      {/* Sidebar */}
+      {/* Desktop Sidebar - Hidden on mobile */}
       <aside className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-slate-900 text-white transition-all duration-300 hidden md:flex flex-col border-r border-slate-800`}>
         <div className="p-4 border-b border-slate-800">
           <Link href="/app" className="flex items-center gap-2 font-bold text-lg">
@@ -131,6 +131,67 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
 
+      {/* Mobile Sidebar Overlay - Shown on mobile when sidebarOpen is true */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 md:hidden z-40"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Mobile Sidebar Drawer */}
+      <aside
+        className={`fixed left-0 top-0 h-screen w-64 bg-slate-900 text-white transition-transform duration-300 flex flex-col border-r border-slate-800 md:hidden z-50 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+          <Link href="/app" className="flex items-center gap-2 font-bold text-lg">
+            <span className="text-2xl">🏨</span>
+            <span>Roommend</span>
+          </Link>
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="p-2 hover:bg-slate-800 rounded-lg text-slate-300"
+          >
+            ✕
+          </button>
+        </div>
+
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+          {visibleMenuItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={() => setSidebarOpen(false)}
+              className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${
+                pathname === item.href
+                  ? 'bg-blue-600 text-white'
+                  : 'text-slate-300 hover:bg-slate-800'
+              }`}
+            >
+              <span className="text-xl">{item.icon}</span>
+              <span className="text-sm">{item.label}</span>
+            </Link>
+          ))}
+        </nav>
+
+        <div className="p-4 border-t border-slate-800 space-y-2">
+          <div className="text-xs text-slate-400 truncate">
+            <div className="font-semibold text-white truncate">
+              {user?.first_name} {user?.last_name}
+            </div>
+            <div className="text-slate-500 truncate">{role?.name}</div>
+          </div>
+          <button
+            onClick={logout}
+            className="w-full px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded-lg transition"
+          >
+            Sign Out
+          </button>
+        </div>
+      </aside>
+
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         <header className="bg-white border-b border-slate-200 px-4 sm:px-6 lg:px-8 py-4">
@@ -138,9 +199,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="md:hidden p-2 hover:bg-slate-100 rounded-lg"
+                className="p-2 hover:bg-slate-100 rounded-lg text-slate-900"
+                title="Toggle sidebar"
               >
-                {sidebarOpen ? '✕' : '☰'}
+                ☰
               </button>
               <h1 className="text-xl font-semibold text-slate-900">
                 {user?.first_name} {user?.last_name}
