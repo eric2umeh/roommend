@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 
 type Event = {
   id: number
@@ -83,8 +84,17 @@ export default function EventsManagementPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between">
-        <div>
+      {/* Back Button */}
+      <Link
+        href="/dashboard/front-desk"
+        className="inline-flex items-center gap-2 px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-lg transition"
+      >
+        <span>←</span>
+        <span>Back to Front Desk</span>
+      </Link>
+
+    <div className="flex items-start justify-between">
+    <div>
           <h1 className="text-3xl font-bold text-slate-900">Events Management</h1>
           <p className="text-slate-600 mt-2">Manage conferences, meetings, and corporate events</p>
         </div>

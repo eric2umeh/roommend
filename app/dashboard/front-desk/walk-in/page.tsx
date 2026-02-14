@@ -1,6 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { CalendarInput } from '@/components/calendar-input'
+import { useToast } from '@/components/toast-provider'
 import { mockRoomTypes } from '@/lib/mock-data'
 
 const roomMockData = [
@@ -53,11 +56,11 @@ const roomTypes = [
 ]
 
 export default function WalkInPage() {
+  const { showToast } = useToast()
   const [step, setStep] = useState(1)
   
   // Step 1: Guest Info
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
+  const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [idType, setIdType] = useState('')
@@ -80,9 +83,20 @@ export default function WalkInPage() {
   const [roomType, setRoomType] = useState('')
   const [selectedRoom, setSelectedRoom] = useState('')
 
-  const calculateNights = (arrival: string, departure: string) => {
-    if (arrival && departure) {
-      const diff = new Date(departure).getTime() - new Date(arrival).getTime()
+  // Bidirectional sync between nights and departure date
+  useEffect(() => {
+    if (arrivalDate && nights > 0) {
+      const arrival = new Date(arrivalDate)
+      const departure = new Date(arrival)
+      departure.setDate(departure.getDate() + nights)
+      setDepartureDate(departure.toISOString().split('T')[0])
+    }
+  }, [arrivalDate, nights])
+
+  const handleDepartureDateChange = (newDepartureDate: string) => {
+    setDepartureDate(newDepartureDate)
+    if (arrivalDate && newDepartureDate) {
+      const diff = new Date(newDepartureDate).getTime() - new Date(arrivalDate).getTime()
       const nightsCount = Math.ceil(diff / (1000 * 60 * 60 * 24))
       setNights(nightsCount > 0 ? nightsCount : 1)
     }
@@ -93,69 +107,82 @@ export default function WalkInPage() {
   )
 
   const handleNext = () => {
-    if (step === 1 && (!firstName || !lastName || !address || !country)) {
-      alert('Please fill in all required fields: First Name, Last Name, Address, Country')
-      return
+    if (step === 1) {
+      if (!fullName.trim()) {
+        showToast('Please enter guest full name', 'error')
+        return
+      }
+      if (!phone.trim()) {
+        showToast('Phone number is required', 'error')
+        return
+      }
+      if (!address.trim()) {
+        showToast('Address is required', 'error')
+        return
+      }
+      if (!country.trim()) {
+        showToast('Country is required', 'error')
+        return
+      }
     }
-    if (step === 2 && (!arrivalDate || !departureDate)) {
-      alert('Please select arrival and departure dates')
-      return
+    
+    if (step === 2) {
+      if (!arrivalDate) {
+        showToast('Please select arrival date', 'error')
+        return
+      }
+      if (!departureDate) {
+        showToast('Please select departure date', 'error')
+        return
+      }
     }
+    
+    if (step === 3) {
+      if (!selectedRoom) {
+        showToast('Please select a room', 'error')
+        return
+      }
+    }
+    
     setStep(step + 1)
   }
 
-  const handleBack = () => {
-    setStep(step - 1)
-  }
-
   const handleSubmit = () => {
-    if (!selectedRoom) {
-      alert('Please select a room')
-      return
-    }
-    alert(`Walk-in booking created! Room ${selectedRoom} for ${firstName} ${lastName}`)
-    // Reset form
-    setStep(1)
-    setFirstName('')
-    setLastName('')
-    setEmail('')
-    setPhone('')
-    setIdType('')
-    setIdNumber('')
-    setOccupation('')
-    setCompany('')
-    setComingFrom('')
-    setGoingTo('')
-    setNationality('')
-    setPassportNumber('')
-    setAddress('')
-    setCountry('')
-    setArrivalDate('')
-    setDepartureDate('')
-    setNights(1)
-    setRoomType('')
-    setSelectedRoom('')
+    showToast('Walk-in booking created successfully!', 'success')
+    // Reset form or navigate
   }
 
   return (
-    <div className="space-y-6 max-w-4xl">
-      <div>
-        <h1 className="text-3xl font-bold text-slate-900">Walk-in Booking</h1>
-        <p className="text-slate-600 mt-2">Quick check-in for guests without reservation</p>
+    <div className="p-6 max-w-7xl mx-auto space-y-6">
+      {/* Back Button */}
+      <div className="flex items-center gap-4">
+        <Link
+          href="/dashboard/front-desk"
+          className="flex items-center gap-2 px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-lg transition"
+        >
+          <span>←</span>
+          <span>Back to Front Desk</span>
+        </Link>
+      </div>
+
+      {/* Header */}
+      <div className="bg-white rounded-lg border border-slate-200 p-6">
+        <h1 className="text-2xl font-bold text-slate-900 mb-2">Walk-in Booking</h1>
+        <p className="text-slate-600">Register a new guest checking in today</p>
       </div>
 
       {/* Progress Steps */}
       <div className="bg-white rounded-lg border border-slate-200 p-6">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between">
           {[
             { num: 1, label: 'Guest Info' },
             { num: 2, label: 'Stay Details' },
             { num: 3, label: 'Room Selection' },
           ].map((s, idx) => (
             <div key={s.num} className="flex items-center flex-1">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center">
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${
+                  className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
                     step >= s.num
                       ? 'bg-blue-600 text-white'
                       : 'bg-slate-200 text-slate-600'
@@ -164,7 +191,7 @@ export default function WalkInPage() {
                   {s.num}
                 </div>
                 <span
-                  className={`text-sm font-medium hidden sm:inline ${
+                  className={`ml-3 font-medium ${
                     step >= s.num ? 'text-blue-600' : 'text-slate-600'
                   }`}
                 >
@@ -173,7 +200,7 @@ export default function WalkInPage() {
               </div>
               {idx < 2 && (
                 <div
-                  className={`flex-1 h-1 mx-2 sm:mx-4 ${
+                  className={`flex-1 h-1 mx-4 ${
                     step > s.num ? 'bg-blue-600' : 'bg-slate-200'
                   }`}
                 />
@@ -181,76 +208,161 @@ export default function WalkInPage() {
             </div>
           ))}
         </div>
+      </div>
 
-        {/* Step 1: Guest Information */}
+      {/* Form Content */}
+      <div className="bg-white rounded-lg border border-slate-200 p-6">
+        {/* Step 1: Guest Info */}
         {step === 1 && (
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">Guest Information</h2>
+          <div className="space-y-6">
+            <h2 className="text-xl font-bold text-slate-900">Guest Information</h2>
             
-            {/* Name */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  First Name <span className="text-red-500">*</span>
+                  Full Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder="Enter guest's full name"
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   required
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Last Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  required
-                />
-              </div>
-            </div>
 
-            {/* Contact Information */}
-            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Phone Number <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="Enter phone number"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter email (optional)"
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Phone</label>
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-            </div>
 
-            {/* Address & Location */}
-            <div className="grid grid-cols-2 gap-4">
               <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">ID Type</label>
+                <select
+                  value={idType}
+                  onChange={(e) => setIdType(e.target.value)}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                >
+                  <option value="">Select ID type (optional)</option>
+                  <option value="passport">Passport</option>
+                  <option value="drivers_license">Driver's License</option>
+                  <option value="national_id">National ID</option>
+                  <option value="voters_card">Voter's Card</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">ID Number</label>
+                <input
+                  type="text"
+                  value={idNumber}
+                  onChange={(e) => setIdNumber(e.target.value)}
+                  placeholder="Enter ID number (optional)"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Occupation</label>
+                <input
+                  type="text"
+                  value={occupation}
+                  onChange={(e) => setOccupation(e.target.value)}
+                  placeholder="Enter occupation (optional)"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Company</label>
+                <input
+                  type="text"
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
+                  placeholder="Enter company (optional)"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Coming From</label>
+                <input
+                  type="text"
+                  value={comingFrom}
+                  onChange={(e) => setComingFrom(e.target.value)}
+                  placeholder="Enter origin (optional)"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Going To</label>
+                <input
+                  type="text"
+                  value={goingTo}
+                  onChange={(e) => setGoingTo(e.target.value)}
+                  placeholder="Enter destination (optional)"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Nationality</label>
+                <input
+                  type="text"
+                  value={nationality}
+                  onChange={(e) => setNationality(e.target.value)}
+                  placeholder="Enter nationality (optional)"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Passport Number</label>
+                <input
+                  type="text"
+                  value={passportNumber}
+                  onChange={(e) => setPassportNumber(e.target.value)}
+                  placeholder="Enter passport number (optional)"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+
+              <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-slate-700 mb-2">
                   Address <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="text"
+                <textarea
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
+                  placeholder="Enter full address"
+                  rows={3}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   required
                 />
               </div>
+
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
                   Country <span className="text-red-500">*</span>
@@ -259,152 +371,42 @@ export default function WalkInPage() {
                   type="text"
                   value={country}
                   onChange={(e) => setCountry(e.target.value)}
+                  placeholder="Enter country"
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   required
                 />
               </div>
-            </div>
-
-            {/* ID Information */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">ID Type</label>
-                <input
-                  type="text"
-                  placeholder="Passport, License, etc."
-                  value={idType}
-                  onChange={(e) => setIdType(e.target.value)}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">ID Number</label>
-                <input
-                  type="text"
-                  value={idNumber}
-                  onChange={(e) => setIdNumber(e.target.value)}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-            </div>
-
-            {/* Professional Information */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Occupation</label>
-                <input
-                  type="text"
-                  value={occupation}
-                  onChange={(e) => setOccupation(e.target.value)}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Company</label>
-                <input
-                  type="text"
-                  value={company}
-                  onChange={(e) => setCompany(e.target.value)}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-            </div>
-
-            {/* Travel Information */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Coming From</label>
-                <input
-                  type="text"
-                  value={comingFrom}
-                  onChange={(e) => setComingFrom(e.target.value)}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Going To</label>
-                <input
-                  type="text"
-                  value={goingTo}
-                  onChange={(e) => setGoingTo(e.target.value)}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-            </div>
-
-            {/* Nationality & Passport */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Nationality</label>
-                <input
-                  type="text"
-                  value={nationality}
-                  onChange={(e) => setNationality(e.target.value)}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Passport Number</label>
-                <input
-                  type="text"
-                  value={passportNumber}
-                  onChange={(e) => setPassportNumber(e.target.value)}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-            </div>
-
-            {/* Navigation */}
-            <div className="flex justify-end gap-3 pt-4">
-              <button
-                onClick={handleNext}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
-              >
-                Next: Stay Details
-              </button>
             </div>
           </div>
         )}
 
         {/* Step 2: Stay Details */}
         {step === 2 && (
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">Stay Details</h2>
+          <div className="space-y-6">
+            <h2 className="text-xl font-bold text-slate-900">Stay Details</h2>
             
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Arrival Date <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="date"
-                  value={arrivalDate}
-                  onChange={(e) => {
-                    setArrivalDate(e.target.value)
-                    calculateNights(e.target.value, departureDate)
-                  }}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Departure Date
-                </label>
-                <input
-                  type="date"
-                  value={departureDate}
-                  onChange={(e) => {
-                    setDepartureDate(e.target.value)
-                    calculateNights(arrivalDate, e.target.value)
-                  }}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <CalendarInput
+                label="Arrival Date"
+                value={arrivalDate}
+                onChange={setArrivalDate}
+                required
+                min={new Date().toISOString().split('T')[0]}
+              />
+
+              <CalendarInput
+                label="Departure Date"
+                value={departureDate}
+                onChange={handleDepartureDateChange}
+                required
+                min={arrivalDate}
+              />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Number of Nights</label>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Number of Nights
+              </label>
               <input
                 type="number"
                 min="1"
@@ -414,28 +416,23 @@ export default function WalkInPage() {
               />
             </div>
 
-            {/* Navigation */}
-            <div className="flex justify-between gap-3 pt-4">
-              <button
-                onClick={handleBack}
-                className="px-6 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition font-medium"
-              >
-                Back
-              </button>
-              <button
-                onClick={handleNext}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
-              >
-                Next: Select Room
-              </button>
-            </div>
+            {arrivalDate && departureDate && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex justify-between items-center">
+                  <span className="font-semibold text-blue-900">Stay Summary:</span>
+                  <span className="text-blue-900">
+                    {new Date(arrivalDate).toLocaleDateString()} - {new Date(departureDate).toLocaleDateString()} ({nights} {nights === 1 ? 'night' : 'nights'})
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
         {/* Step 3: Room Selection */}
         {step === 3 && (
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">Select Room</h2>
+          <div className="space-y-6">
+            <h2 className="text-xl font-bold text-slate-900">Room Selection</h2>
             
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -453,7 +450,7 @@ export default function WalkInPage() {
                 <option value="">Select room type</option>
                 {roomTypes.map(type => (
                   <option key={type.name} value={type.name}>
-                    {type.name} - ₦{type.price.toLocaleString()}
+                    {type.name} - ₦{type.price.toLocaleString()}/night
                   </option>
                 ))}
               </select>
@@ -461,28 +458,29 @@ export default function WalkInPage() {
 
             {roomType && (
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-sm font-medium text-slate-700 mb-3">
                   Available Rooms <span className="text-red-500">*</span>
                 </label>
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 max-h-96 overflow-y-auto p-2 border border-slate-200 rounded-lg">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-h-96 overflow-y-auto p-2 border border-slate-200 rounded-lg">
                   {availableRooms.length > 0 ? (
                     availableRooms.map(room => (
                       <button
-                        key={room.id}
+                        key={room.room_number}
                         onClick={() => setSelectedRoom(room.room_number)}
-                        className={`p-3 border-2 rounded-lg text-center transition text-sm font-medium ${
+                        className={`p-4 border-2 rounded-lg text-left transition ${
                           selectedRoom === room.room_number
-                            ? 'border-blue-600 bg-blue-50 text-blue-900'
+                            ? 'border-blue-600 bg-blue-50'
                             : 'border-slate-300 hover:border-blue-400'
                         }`}
                       >
-                        <div className="font-bold">{room.room_number}</div>
-                        <div className="text-xs text-slate-600 mt-1">Floor {room.floor}</div>
+                        <div className="font-bold text-lg text-slate-900">{room.room_number}</div>
+                        <div className="text-sm text-slate-600 mt-1">Floor {room.floor}</div>
+                        <div className="text-sm text-slate-600">₦{room.base_price_naira.toLocaleString()}/night</div>
                       </button>
                     ))
                   ) : (
-                    <div className="col-span-full text-center py-8 text-slate-500">
-                      No available rooms for this type
+                    <div className="col-span-full text-center py-8 text-slate-600">
+                      No available rooms for selected type
                     </div>
                   )}
                 </div>
@@ -490,47 +488,61 @@ export default function WalkInPage() {
             )}
 
             {selectedRoom && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h3 className="font-semibold text-blue-900 mb-2">Booking Summary</h3>
-                <div className="space-y-1 text-sm text-blue-900">
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span>Guest:</span>
-                    <span className="font-medium">{firstName} {lastName}</span>
+                    <span className="font-semibold text-green-900">Room:</span>
+                    <span className="text-green-900">{selectedRoom}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Arrival:</span>
-                    <span className="font-medium">{arrivalDate}</span>
+                    <span className="font-semibold text-green-900">Type:</span>
+                    <span className="text-green-900">{roomType}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Nights:</span>
-                    <span className="font-medium">{nights}</span>
+                    <span className="font-semibold text-green-900">Nights:</span>
+                    <span className="text-green-900">{nights}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Room:</span>
-                    <span className="font-medium">{selectedRoom}</span>
+                  <div className="flex justify-between pt-2 border-t border-green-300">
+                    <span className="font-bold text-green-900">Total:</span>
+                    <span className="font-bold text-lg text-green-900">
+                      ₦{((roomMockData.find(r => r.room_number === selectedRoom)?.base_price_naira || 0) * nights).toLocaleString()}
+                    </span>
                   </div>
                 </div>
               </div>
             )}
-
-            {/* Navigation */}
-            <div className="flex justify-between gap-3 pt-4">
-              <button
-                onClick={handleBack}
-                className="px-6 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition font-medium"
-              >
-                Back
-              </button>
-              <button
-                onClick={handleSubmit}
-                disabled={!selectedRoom}
-                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium disabled:bg-slate-300 disabled:cursor-not-allowed"
-              >
-                Complete Booking
-              </button>
-            </div>
           </div>
         )}
+
+        {/* Action Buttons */}
+        <div className="flex justify-between items-center mt-8 pt-6 border-t border-slate-200">
+          {step > 1 ? (
+            <button
+              onClick={() => setStep(step - 1)}
+              className="px-6 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition font-medium"
+            >
+              Previous
+            </button>
+          ) : (
+            <div />
+          )}
+
+          {step < 3 ? (
+            <button
+              onClick={handleNext}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
+            >
+              Next
+            </button>
+          ) : (
+            <button
+              onClick={handleSubmit}
+              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium"
+            >
+              Complete Booking
+            </button>
+          )}
+        </div>
       </div>
     </div>
   )

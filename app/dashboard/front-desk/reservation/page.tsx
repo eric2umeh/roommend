@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
+import { useToast } from '@/components/toast-provider'
 import { DataTable, type Column } from '@/components/data-table'
 
 interface Reservation {
@@ -62,9 +64,9 @@ const mockReservations: Reservation[] = [
 
 export default function ReservationPage() {
   const { hasPermission } = useAuth()
+  const { showToast } = useToast()
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null)
-  const [showModal, setShowModal] = useState(false)
 
   // Form state
   const [formData, setFormData] = useState({
@@ -117,10 +119,10 @@ export default function ReservationPage() {
 
   const handleCreateReservation = () => {
     if (!formData.guestName || !formData.checkIn || !formData.checkOut || !formData.roomNumber) {
-      alert('Please fill in all required fields')
+      showToast('Please fill in all required fields', 'error')
       return
     }
-    alert('Reservation created successfully!')
+    showToast('Reservation created successfully!', 'success')
     setShowCreateForm(false)
     setFormData({
       guestName: '',
@@ -134,6 +136,15 @@ export default function ReservationPage() {
 
   return (
     <div className="space-y-6">
+      {/* Back Button */}
+      <Link
+        href="/dashboard/front-desk"
+        className="inline-flex items-center gap-2 px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-lg transition"
+      >
+        <span>←</span>
+        <span>Back to Front Desk</span>
+      </Link>
+
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Reservations</h1>

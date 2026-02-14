@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { DataTable, type Column } from '@/components/data-table'
 
 type CityLedgerAccount = {
@@ -113,8 +114,17 @@ export default function CityLedgerPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+      {/* Back Button */}
+      <Link
+        href="/dashboard/front-desk"
+        className="inline-flex items-center gap-2 px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-lg transition"
+      >
+        <span>←</span>
+        <span>Back to Front Desk</span>
+      </Link>
+
+    {/* Header */}
+    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">City Ledger</h1>
           <p className="text-slate-600 mt-2 max-w-3xl">

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 
 type ReportType = 'checkout' | 'housekeeping' | 'police_local' | 'police_foreign'
 
@@ -54,6 +55,15 @@ export default function ReportsPage() {
 
   return (
     <div className="space-y-6">
+      {/* Back Button */}
+      <Link
+        href="/dashboard/front-desk"
+        className="inline-flex items-center gap-2 px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-lg transition"
+      >
+        <span>←</span>
+        <span>Back to Front Desk</span>
+      </Link>
+
       <div>
         <h1 className="text-3xl font-bold text-slate-900">Front Desk Reports</h1>
         <p className="text-slate-600 mt-2">View and print all department reports</p>

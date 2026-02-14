@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { DataTable, type Column } from '@/components/data-table'
 import { mockRooms } from '@/lib/mock-data'
 import { useAuth } from '@/lib/auth-context'
@@ -32,10 +33,20 @@ export default function OutOfOrderPage() {
   const isAdmin = role?.name === 'Admin'
 
   if (!isAdmin) {
-    return (
+  return (
+    <div className="space-y-6">
+      {/* Back Button */}
+      <Link
+        href="/dashboard/front-desk"
+        className="inline-flex items-center gap-2 px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-lg transition"
+      >
+        <span>←</span>
+        <span>Back to Front Desk</span>
+      </Link>
+
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="text-center">
-          <div className="text-6xl mb-4">🔒</div>
+      <div className="text-center">
+      <div className="text-6xl mb-4">🔒</div>
           <h2 className="text-2xl font-bold text-slate-900 mb-2">Access Restricted</h2>
           <p className="text-slate-600">Only administrators can access Out of Order management</p>
         </div>
