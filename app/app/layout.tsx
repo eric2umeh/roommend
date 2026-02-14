@@ -7,16 +7,44 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '@/lib/auth-context'
 
 const SIDEBAR_MENU = [
+  // Core Operations
   { label: 'Dashboard', href: '/app', icon: '📊', permissions: [] },
   { label: 'Reservations', href: '/app/reservations', icon: '📅', permissions: ['manage_reservations'] },
   { label: 'Rooms', href: '/app/rooms', icon: '🏨', permissions: ['manage_rooms'] },
   { label: 'Guests', href: '/app/guests', icon: '👥', permissions: ['view_guests'] },
-  { label: 'Restaurant', href: '/app/orders', icon: '🍽️', permissions: ['manage_orders'] },
+  
+  // Restaurant & Food Service
+  { label: 'Restaurant Orders', href: '/app/orders', icon: '🍽️', permissions: ['manage_orders'] },
+  { label: 'Menu', href: '/app/menu', icon: '📋', permissions: ['manage_menu'] },
+  
+  // Inventory & Supplies
   { label: 'Inventory', href: '/app/inventory', icon: '📦', permissions: ['manage_inventory'] },
+  { label: 'Suppliers', href: '/app/suppliers', icon: '🚚', permissions: ['manage_suppliers'] },
+  
+  // Housekeeping & Maintenance
   { label: 'Housekeeping', href: '/app/housekeeping', icon: '🧹', permissions: ['manage_tasks'] },
+  { label: 'Maintenance', href: '/app/maintenance', icon: '🔧', permissions: ['manage_maintenance'] },
+  
+  // Human Resources
   { label: 'Staff', href: '/app/staff', icon: '👨‍💼', permissions: ['manage_staff'] },
+  { label: 'Payroll', href: '/app/payroll', icon: '💰', permissions: ['manage_payroll'] },
+  { label: 'Attendance', href: '/app/attendance', icon: '📍', permissions: ['manage_attendance'] },
+  
+  // Finance & Accounting
+  { label: 'Accounting', href: '/app/accounting', icon: '💳', permissions: ['manage_accounting'] },
+  { label: 'Billing', href: '/app/billing', icon: '🧾', permissions: ['manage_billing'] },
+  
+  // Marketing & Organizations
+  { label: 'Marketing', href: '/app/marketing', icon: '📢', permissions: ['manage_marketing'] },
+  { label: 'Organizations', href: '/app/organizations', icon: '🏢', permissions: ['manage_organizations'] },
+  
+  // Analytics & Reports
   { label: 'Reports', href: '/app/reports', icon: '📈', permissions: ['view_reports'] },
+  { label: 'Analytics', href: '/app/analytics', icon: '📉', permissions: ['view_analytics'] },
+  
+  // Admin
   { label: 'Settings', href: '/app/settings', icon: '⚙️', permissions: ['access_settings'] },
+  { label: 'Roles & Permissions', href: '/app/settings/roles', icon: '🔐', permissions: ['manage_roles'] },
 ]
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -49,7 +77,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
-      {/* Sidebar */}
+      {/* Desktop Sidebar - Hidden on mobile */}
       <aside className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-slate-900 text-white transition-all duration-300 hidden md:flex flex-col border-r border-slate-800`}>
         <div className="p-4 border-b border-slate-800">
           <Link href="/app" className="flex items-center gap-2 font-bold text-lg">
@@ -103,6 +131,67 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
 
+      {/* Mobile Sidebar Overlay - Shown on mobile when sidebarOpen is true */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 md:hidden z-40"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Mobile Sidebar Drawer */}
+      <aside
+        className={`fixed left-0 top-0 h-screen w-64 bg-slate-900 text-white transition-transform duration-300 flex flex-col border-r border-slate-800 md:hidden z-50 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+          <Link href="/app" className="flex items-center gap-2 font-bold text-lg">
+            <span className="text-2xl">🏨</span>
+            <span>Roommend</span>
+          </Link>
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="p-2 hover:bg-slate-800 rounded-lg text-slate-300"
+          >
+            ✕
+          </button>
+        </div>
+
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+          {visibleMenuItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={() => setSidebarOpen(false)}
+              className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${
+                pathname === item.href
+                  ? 'bg-blue-600 text-white'
+                  : 'text-slate-300 hover:bg-slate-800'
+              }`}
+            >
+              <span className="text-xl">{item.icon}</span>
+              <span className="text-sm">{item.label}</span>
+            </Link>
+          ))}
+        </nav>
+
+        <div className="p-4 border-t border-slate-800 space-y-2">
+          <div className="text-xs text-slate-400 truncate">
+            <div className="font-semibold text-white truncate">
+              {user?.first_name} {user?.last_name}
+            </div>
+            <div className="text-slate-500 truncate">{role?.name}</div>
+          </div>
+          <button
+            onClick={logout}
+            className="w-full px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded-lg transition"
+          >
+            Sign Out
+          </button>
+        </div>
+      </aside>
+
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         <header className="bg-white border-b border-slate-200 px-4 sm:px-6 lg:px-8 py-4">
@@ -110,9 +199,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="md:hidden p-2 hover:bg-slate-100 rounded-lg"
+                className="p-2 hover:bg-slate-100 rounded-lg text-slate-900"
+                title="Toggle sidebar"
               >
-                {sidebarOpen ? '✕' : '☰'}
+                ☰
               </button>
               <h1 className="text-xl font-semibold text-slate-900">
                 {user?.first_name} {user?.last_name}
