@@ -29,7 +29,7 @@ export default function LoginPage() {
       if (success) {
         // Small delay to ensure context updates
         await new Promise(resolve => setTimeout(resolve, 100))
-        router.push('/app')
+        router.push('/dashboard')
       } else {
         setError('Invalid email or password')
       }

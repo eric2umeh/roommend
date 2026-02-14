@@ -32,7 +32,7 @@ export function ProtectedRoute({
         : requiredPermissions.every((p) => hasPermission(p))
 
       if (!hasAccess) {
-        router.push('/app/unauthorized')
+        router.push('/dashboard/unauthorized')
       }
     }
   }, [isLoggedIn, isLoading, requiredPermissions, requireAny, hasPermission, hasAnyPermission, router])
