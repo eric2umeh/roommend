@@ -300,7 +300,8 @@ export default function FrontDeskPage() {
               ) : (
                 <div className="col-span-full text-center py-12 text-slate-500">
                   No rooms found for selected filters
-        </div>
+                </div>
+              )}
             </div>
           )}
 
