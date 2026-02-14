@@ -30,6 +30,28 @@ export default function MarketingPage() {
     { key: 'status', label: 'Status', render: (v) => <span className={`px-2 py-1 rounded text-xs font-medium ${v === 'active' ? 'bg-green-100 text-green-800' : v === 'draft' ? 'bg-slate-100 text-slate-800' : 'bg-blue-100 text-blue-800'}`}>{v}</span> },
   ]
 
+  const filters = [
+    {
+      key: 'type',
+      label: 'Campaign Type',
+      options: [
+        { value: 'Promotional', label: 'Promotional' },
+        { value: 'B2B', label: 'B2B' },
+        { value: 'Email', label: 'Email' },
+        { value: 'Proposal', label: 'Proposal' },
+      ],
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      options: [
+        { value: 'active', label: 'Active' },
+        { value: 'draft', label: 'Draft' },
+        { value: 'completed', label: 'Completed' },
+      ],
+    },
+  ]
+
   return (
     <div className="space-y-6">
       <div>
@@ -37,7 +59,7 @@ export default function MarketingPage() {
         <p className="text-slate-600 mt-2">Manage promotional campaigns and outreach</p>
       </div>
       <div className="bg-white rounded-lg border border-slate-200 p-6">
-        <DataTable data={mockCampaigns} columns={columns} itemsPerPage={10} searchPlaceholder="Search campaigns..." mobileColumns={['name', 'type', 'status']} />
+        <DataTable data={mockCampaigns} columns={columns} itemsPerPage={10} searchPlaceholder="Search campaigns..." filters={filters} mobileColumns={['name', 'type', 'status']} />
       </div>
     </div>
   )
