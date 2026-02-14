@@ -12,19 +12,20 @@ export default function GuestDatabasePage() {
     { key: 'last_name', label: 'Last Name', sortable: true, searchable: true },
     { key: 'email', label: 'Email', searchable: true },
     { key: 'phone', label: 'Phone' },
-    { key: 'nationality', label: 'Nationality' },
+    { key: 'country', label: 'Country' },
     { key: 'total_stays', label: 'Total Stays', sortable: true },
-    { key: 'total_spent', label: 'Total Spent', sortable: true, render: (v) => `₦${v.toLocaleString()}` },
+    { key: 'total_spent_naira', label: 'Total Spent', sortable: true, render: (v) => `₦${v.toLocaleString()}` },
   ]
 
   const filters = [
     {
-      key: 'nationality',
-      label: 'Nationality',
+      key: 'country',
+      label: 'Country',
       options: [
-        { value: 'Nigerian', label: 'Nigerian' },
-        { value: 'American', label: 'American' },
-        { value: 'British', label: 'British' },
+        { value: 'Nigeria', label: 'Nigeria' },
+        { value: 'Ghana', label: 'Ghana' },
+        { value: 'USA', label: 'USA' },
+        { value: 'UK', label: 'UK' },
       ],
     },
   ]
@@ -51,13 +52,13 @@ export default function GuestDatabasePage() {
         <div className="bg-white rounded-lg border border-slate-200 p-4">
           <div className="text-sm text-slate-600 mb-1">Total Revenue</div>
           <div className="text-2xl font-bold text-green-600">
-            ₦{mockGuests.reduce((sum, g) => sum + g.total_spent, 0).toLocaleString()}
+            ₦{mockGuests.reduce((sum, g) => sum + g.total_spent_naira, 0).toLocaleString()}
           </div>
         </div>
         <div className="bg-white rounded-lg border border-slate-200 p-4">
           <div className="text-sm text-slate-600 mb-1">Avg Stay Value</div>
           <div className="text-2xl font-bold text-purple-600">
-            ₦{Math.round(mockGuests.reduce((sum, g) => sum + g.total_spent, 0) / mockGuests.length).toLocaleString()}
+            ₦{Math.round(mockGuests.reduce((sum, g) => sum + g.total_spent_naira, 0) / mockGuests.length).toLocaleString()}
           </div>
         </div>
       </div>
@@ -107,8 +108,8 @@ export default function GuestDatabasePage() {
                   <div className="font-semibold text-slate-900">{selectedGuest.phone}</div>
                 </div>
                 <div>
-                  <div className="text-sm text-slate-600">Nationality</div>
-                  <div className="font-semibold text-slate-900">{selectedGuest.nationality}</div>
+                  <div className="text-sm text-slate-600">Country</div>
+                  <div className="font-semibold text-slate-900">{selectedGuest.country}</div>
                 </div>
                 <div>
                   <div className="text-sm text-slate-600">Total Stays</div>
@@ -117,7 +118,7 @@ export default function GuestDatabasePage() {
                 <div>
                   <div className="text-sm text-slate-600">Total Spent</div>
                   <div className="font-semibold text-green-600">
-                    ₦{selectedGuest.total_spent.toLocaleString()}
+                    ₦{selectedGuest.total_spent_naira.toLocaleString()}
                   </div>
                 </div>
               </div>
