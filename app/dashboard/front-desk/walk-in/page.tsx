@@ -1,44 +1,144 @@
 'use client'
 
 import { useState } from 'react'
-import { mockRooms } from '@/lib/mock-data'
+import { mockRoomTypes } from '@/lib/mock-data'
+
+const roomMockData = [
+  // Floor 1 (7 rooms: 101-107, with 103 as Royal)
+  { id: '101', room_number: '101', floor: 1, room_type: 'Deluxe', base_price_naira: 75000, status: 'clean' },
+  { id: '102', room_number: '102', floor: 1, room_type: 'Deluxe', base_price_naira: 75000, status: 'clean' },
+  { id: '103', room_number: '103', floor: 1, room_type: 'Royal', base_price_naira: 85000, status: 'clean' },
+  { id: '104', room_number: '104', floor: 1, room_type: 'Deluxe', base_price_naira: 75000, status: 'occupied' },
+  { id: '105', room_number: '105', floor: 1, room_type: 'Deluxe', base_price_naira: 75000, status: 'clean' },
+  { id: '106', room_number: '106', floor: 1, room_type: 'Deluxe', base_price_naira: 75000, status: 'clean' },
+  { id: '107', room_number: '107', floor: 1, room_type: 'Deluxe', base_price_naira: 75000, status: 'dirty' },
+  
+  // Floor 2 (28 rooms: mix of types)
+  { id: '201', room_number: '201', floor: 2, room_type: 'King Size', base_price_naira: 110000, status: 'clean' },
+  { id: '202', room_number: '202', floor: 2, room_type: 'King Size', base_price_naira: 110000, status: 'clean' },
+  { id: '203', room_number: '203', floor: 2, room_type: 'King Size', base_price_naira: 110000, status: 'occupied' },
+  { id: '204', room_number: '204', floor: 2, room_type: 'Diplomatic Suite', base_price_naira: 180000, status: 'clean' },
+  { id: '213', room_number: '213', floor: 2, room_type: 'Executive Suite', base_price_naira: 160000, status: 'clean' },
+  { id: '223', room_number: '223', floor: 2, room_type: 'Mini Suite', base_price_naira: 140000, status: 'clean' },
+  ...Array.from({ length: 22 }, (_, i) => ({
+    id: String(205 + i),
+    room_number: String(205 + i).padStart(3, '2'),
+    floor: 2,
+    room_type: ['King Size', 'Mini Suite', 'Executive Suite'][i % 3],
+    base_price_naira: [110000, 140000, 160000][i % 3],
+    status: i % 4 === 0 ? 'occupied' : 'clean'
+  })),
+  
+  // Floor 3 (29 rooms)
+  { id: '301', room_number: '301', floor: 3, room_type: 'Royal', base_price_naira: 85000, status: 'clean' },
+  { id: '305', room_number: '305', floor: 3, room_type: 'Executive Suite', base_price_naira: 160000, status: 'clean' },
+  { id: '324', room_number: '324', floor: 3, room_type: 'Executive Suite', base_price_naira: 160000, status: 'clean' },
+  ...Array.from({ length: 26 }, (_, i) => ({
+    id: String(302 + i),
+    room_number: String(302 + i),
+    floor: 3,
+    room_type: i === 3 || i === 22 ? 'Executive Suite' : 'Royal',
+    base_price_naira: i === 3 || i === 22 ? 160000 : 85000,
+    status: i % 5 === 0 ? 'occupied' : 'clean'
+  })),
+]
+
+const roomTypes = [
+  { name: 'Deluxe', price: 75000 },
+  { name: 'Royal', price: 85000 },
+  { name: 'King Size', price: 110000 },
+  { name: 'Mini Suite', price: 140000 },
+  { name: 'Executive Suite', price: 160000 },
+  { name: 'Diplomatic Suite', price: 180000 },
+]
 
 export default function WalkInPage() {
   const [step, setStep] = useState(1)
-  const [guestName, setGuestName] = useState('')
-  const [guestEmail, setGuestEmail] = useState('')
-  const [guestPhone, setGuestPhone] = useState('')
+  
+  // Step 1: Guest Info
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
   const [idType, setIdType] = useState('')
   const [idNumber, setIdNumber] = useState('')
+  const [occupation, setOccupation] = useState('')
+  const [company, setCompany] = useState('')
+  const [comingFrom, setComingFrom] = useState('')
+  const [goingTo, setGoingTo] = useState('')
+  const [nationality, setNationality] = useState('')
+  const [passportNumber, setPassportNumber] = useState('')
+  const [address, setAddress] = useState('')
+  const [country, setCountry] = useState('')
+  
+  // Step 2: Stay Details
+  const [arrivalDate, setArrivalDate] = useState('')
+  const [departureDate, setDepartureDate] = useState('')
   const [nights, setNights] = useState(1)
-  const [adults, setAdults] = useState(1)
-  const [children, setChildren] = useState(0)
+  
+  // Step 3: Room Selection
   const [roomType, setRoomType] = useState('')
   const [selectedRoom, setSelectedRoom] = useState('')
 
-  const availableRooms = mockRooms.filter(
-    (room) => room.status === 'clean' && (roomType === '' || room.room_type === roomType)
+  const calculateNights = (arrival: string, departure: string) => {
+    if (arrival && departure) {
+      const diff = new Date(departure).getTime() - new Date(arrival).getTime()
+      const nightsCount = Math.ceil(diff / (1000 * 60 * 60 * 24))
+      setNights(nightsCount > 0 ? nightsCount : 1)
+    }
+  }
+
+  const availableRooms = roomMockData.filter(
+    room => room.status === 'clean' && (roomType === '' || room.room_type === roomType)
   )
-  const roomTypes = Array.from(new Set(mockRooms.map((r) => r.room_type)))
+
+  const handleNext = () => {
+    if (step === 1 && (!firstName || !lastName || !address || !country)) {
+      alert('Please fill in all required fields: First Name, Last Name, Address, Country')
+      return
+    }
+    if (step === 2 && (!arrivalDate || !departureDate)) {
+      alert('Please select arrival and departure dates')
+      return
+    }
+    setStep(step + 1)
+  }
+
+  const handleBack = () => {
+    setStep(step - 1)
+  }
 
   const handleSubmit = () => {
-    alert('Walk-in booking created successfully!')
+    if (!selectedRoom) {
+      alert('Please select a room')
+      return
+    }
+    alert(`Walk-in booking created! Room ${selectedRoom} for ${firstName} ${lastName}`)
     // Reset form
     setStep(1)
-    setGuestName('')
-    setGuestEmail('')
-    setGuestPhone('')
+    setFirstName('')
+    setLastName('')
+    setEmail('')
+    setPhone('')
     setIdType('')
     setIdNumber('')
+    setOccupation('')
+    setCompany('')
+    setComingFrom('')
+    setGoingTo('')
+    setNationality('')
+    setPassportNumber('')
+    setAddress('')
+    setCountry('')
+    setArrivalDate('')
+    setDepartureDate('')
     setNights(1)
-    setAdults(1)
-    setChildren(0)
     setRoomType('')
     setSelectedRoom('')
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-4xl">
       <div>
         <h1 className="text-3xl font-bold text-slate-900">Walk-in Booking</h1>
         <p className="text-slate-600 mt-2">Quick check-in for guests without reservation</p>
@@ -55,7 +155,7 @@ export default function WalkInPage() {
             <div key={s.num} className="flex items-center flex-1">
               <div className="flex items-center gap-3">
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
+                  className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${
                     step >= s.num
                       ? 'bg-blue-600 text-white'
                       : 'bg-slate-200 text-slate-600'
@@ -64,7 +164,7 @@ export default function WalkInPage() {
                   {s.num}
                 </div>
                 <span
-                  className={`text-sm font-medium ${
+                  className={`text-sm font-medium hidden sm:inline ${
                     step >= s.num ? 'text-blue-600' : 'text-slate-600'
                   }`}
                 >
@@ -73,7 +173,7 @@ export default function WalkInPage() {
               </div>
               {idx < 2 && (
                 <div
-                  className={`flex-1 h-1 mx-4 ${
+                  className={`flex-1 h-1 mx-2 sm:mx-4 ${
                     step > s.num ? 'bg-blue-600' : 'bg-slate-200'
                   }`}
                 />
@@ -82,87 +182,185 @@ export default function WalkInPage() {
           ))}
         </div>
 
-        {/* Step 1: Guest Info */}
+        {/* Step 1: Guest Information */}
         {step === 1 && (
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                Guest Full Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={guestName}
-                onChange={(e) => setGuestName(e.target.value)}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <h2 className="text-lg font-semibold text-slate-900 mb-4">Guest Information</h2>
+            
+            {/* Name */}
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Email <span className="text-red-500">*</span>
+                  First Name <span className="text-red-500">*</span>
                 </label>
+                <input
+                  type="text"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Last Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Contact Information */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
                 <input
                   type="email"
-                  value={guestEmail}
-                  onChange={(e) => setGuestEmail(e.target.value)}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Phone</label>
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+            </div>
+
+            {/* Address & Location */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Address <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   required
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Phone Number <span className="text-red-500">*</span>
+                  Country <span className="text-red-500">*</span>
                 </label>
                 <input
-                  type="tel"
-                  value={guestPhone}
-                  onChange={(e) => setGuestPhone(e.target.value)}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  type="text"
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   required
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* ID Information */}
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  ID Type <span className="text-red-500">*</span>
-                </label>
-                <select
+                <label className="block text-sm font-medium text-slate-700 mb-2">ID Type</label>
+                <input
+                  type="text"
+                  placeholder="Passport, License, etc."
                   value={idType}
                   onChange={(e) => setIdType(e.target.value)}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  required
-                >
-                  <option value="">Select ID type</option>
-                  <option value="passport">International Passport</option>
-                  <option value="national_id">National ID</option>
-                  <option value="drivers_license">Driver's License</option>
-                </select>
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  ID Number <span className="text-red-500">*</span>
-                </label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">ID Number</label>
                 <input
                   type="text"
                   value={idNumber}
                   onChange={(e) => setIdNumber(e.target.value)}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  required
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
             </div>
 
-            <div className="flex justify-end pt-4">
+            {/* Professional Information */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Occupation</label>
+                <input
+                  type="text"
+                  value={occupation}
+                  onChange={(e) => setOccupation(e.target.value)}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Company</label>
+                <input
+                  type="text"
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+            </div>
+
+            {/* Travel Information */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Coming From</label>
+                <input
+                  type="text"
+                  value={comingFrom}
+                  onChange={(e) => setComingFrom(e.target.value)}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Going To</label>
+                <input
+                  type="text"
+                  value={goingTo}
+                  onChange={(e) => setGoingTo(e.target.value)}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+            </div>
+
+            {/* Nationality & Passport */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Nationality</label>
+                <input
+                  type="text"
+                  value={nationality}
+                  onChange={(e) => setNationality(e.target.value)}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Passport Number</label>
+                <input
+                  type="text"
+                  value={passportNumber}
+                  onChange={(e) => setPassportNumber(e.target.value)}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+            </div>
+
+            {/* Navigation */}
+            <div className="flex justify-end gap-3 pt-4">
               <button
-                onClick={() => setStep(2)}
-                disabled={!guestName || !guestEmail || !guestPhone || !idType || !idNumber}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium disabled:bg-slate-300 disabled:cursor-not-allowed"
+                onClick={handleNext}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
               >
-                Next
+                Next: Stay Details
               </button>
             </div>
           </div>
@@ -171,58 +369,64 @@ export default function WalkInPage() {
         {/* Step 2: Stay Details */}
         {step === 2 && (
           <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <h2 className="text-lg font-semibold text-slate-900 mb-4">Stay Details</h2>
+            
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Number of Nights <span className="text-red-500">*</span>
+                  Arrival Date <span className="text-red-500">*</span>
                 </label>
                 <input
-                  type="number"
-                  min="1"
-                  value={nights}
-                  onChange={(e) => setNights(Number(e.target.value))}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  type="date"
+                  value={arrivalDate}
+                  onChange={(e) => {
+                    setArrivalDate(e.target.value)
+                    calculateNights(e.target.value, departureDate)
+                  }}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   required
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Adults <span className="text-red-500">*</span>
+                  Departure Date
                 </label>
                 <input
-                  type="number"
-                  min="1"
-                  value={adults}
-                  onChange={(e) => setAdults(Number(e.target.value))}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Children</label>
-                <input
-                  type="number"
-                  min="0"
-                  value={children}
-                  onChange={(e) => setChildren(Number(e.target.value))}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  type="date"
+                  value={departureDate}
+                  onChange={(e) => {
+                    setDepartureDate(e.target.value)
+                    calculateNights(arrivalDate, e.target.value)
+                  }}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
             </div>
 
-            <div className="flex justify-between pt-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Number of Nights</label>
+              <input
+                type="number"
+                min="1"
+                value={nights}
+                onChange={(e) => setNights(Number(e.target.value))}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+
+            {/* Navigation */}
+            <div className="flex justify-between gap-3 pt-4">
               <button
-                onClick={() => setStep(1)}
+                onClick={handleBack}
                 className="px-6 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition font-medium"
               >
                 Back
               </button>
               <button
-                onClick={() => setStep(3)}
-                disabled={nights < 1 || adults < 1}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium disabled:bg-slate-300 disabled:cursor-not-allowed"
+                onClick={handleNext}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
               >
-                Next
+                Next: Select Room
               </button>
             </div>
           </div>
@@ -231,6 +435,8 @@ export default function WalkInPage() {
         {/* Step 3: Room Selection */}
         {step === 3 && (
           <div className="space-y-4">
+            <h2 className="text-lg font-semibold text-slate-900 mb-4">Select Room</h2>
+            
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
                 Room Type <span className="text-red-500">*</span>
@@ -241,13 +447,13 @@ export default function WalkInPage() {
                   setRoomType(e.target.value)
                   setSelectedRoom('')
                 }}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
                 required
               >
                 <option value="">Select room type</option>
-                {roomTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {type}
+                {roomTypes.map(type => (
+                  <option key={type.name} value={type.name}>
+                    {type.name} - ₦{type.price.toLocaleString()}
                   </option>
                 ))}
               </select>
@@ -258,30 +464,59 @@ export default function WalkInPage() {
                 <label className="block text-sm font-medium text-slate-700 mb-2">
                   Available Rooms <span className="text-red-500">*</span>
                 </label>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-h-64 overflow-y-auto p-2 border border-slate-200 rounded-lg">
-                  {availableRooms.map((room) => (
-                    <button
-                      key={room.room_number}
-                      onClick={() => setSelectedRoom(room.room_number)}
-                      className={`p-4 border-2 rounded-lg text-left transition ${
-                        selectedRoom === room.room_number
-                          ? 'border-blue-600 bg-blue-50'
-                          : 'border-slate-300 hover:border-blue-400'
-                      }`}
-                    >
-                      <div className="font-bold text-lg text-slate-900">{room.room_number}</div>
-                      <div className="text-sm text-slate-600 mt-1">
-                        ₦{room.base_price_naira.toLocaleString()}/night
-                      </div>
-                    </button>
-                  ))}
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 max-h-96 overflow-y-auto p-2 border border-slate-200 rounded-lg">
+                  {availableRooms.length > 0 ? (
+                    availableRooms.map(room => (
+                      <button
+                        key={room.id}
+                        onClick={() => setSelectedRoom(room.room_number)}
+                        className={`p-3 border-2 rounded-lg text-center transition text-sm font-medium ${
+                          selectedRoom === room.room_number
+                            ? 'border-blue-600 bg-blue-50 text-blue-900'
+                            : 'border-slate-300 hover:border-blue-400'
+                        }`}
+                      >
+                        <div className="font-bold">{room.room_number}</div>
+                        <div className="text-xs text-slate-600 mt-1">Floor {room.floor}</div>
+                      </button>
+                    ))
+                  ) : (
+                    <div className="col-span-full text-center py-8 text-slate-500">
+                      No available rooms for this type
+                    </div>
+                  )}
                 </div>
               </div>
             )}
 
-            <div className="flex justify-between pt-4">
+            {selectedRoom && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h3 className="font-semibold text-blue-900 mb-2">Booking Summary</h3>
+                <div className="space-y-1 text-sm text-blue-900">
+                  <div className="flex justify-between">
+                    <span>Guest:</span>
+                    <span className="font-medium">{firstName} {lastName}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Arrival:</span>
+                    <span className="font-medium">{arrivalDate}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Nights:</span>
+                    <span className="font-medium">{nights}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Room:</span>
+                    <span className="font-medium">{selectedRoom}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Navigation */}
+            <div className="flex justify-between gap-3 pt-4">
               <button
-                onClick={() => setStep(2)}
+                onClick={handleBack}
                 className="px-6 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition font-medium"
               >
                 Back
@@ -289,9 +524,9 @@ export default function WalkInPage() {
               <button
                 onClick={handleSubmit}
                 disabled={!selectedRoom}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium disabled:bg-slate-300 disabled:cursor-not-allowed"
+                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium disabled:bg-slate-300 disabled:cursor-not-allowed"
               >
-                Complete Check-in
+                Complete Booking
               </button>
             </div>
           </div>
