@@ -30,6 +30,27 @@ export default function PayrollPage() {
     { key: 'status', label: 'Status', render: (v) => <span className={`px-2 py-1 rounded text-xs ${v === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>{v}</span> },
   ]
 
+  const filters = [
+    {
+      key: 'position',
+      label: 'Position',
+      options: [
+        { value: 'Manager', label: 'Manager' },
+        { value: 'Front Desk', label: 'Front Desk' },
+        { value: 'Chef', label: 'Chef' },
+        { value: 'Housekeeper', label: 'Housekeeper' },
+      ],
+    },
+    {
+      key: 'status',
+      label: 'Payment Status',
+      options: [
+        { value: 'paid', label: 'Paid' },
+        { value: 'pending', label: 'Pending' },
+      ],
+    },
+  ]
+
   return (
     <div className="space-y-6">
       <div>
@@ -37,7 +58,7 @@ export default function PayrollPage() {
         <p className="text-slate-600 mt-2">Manage staff salaries and payments</p>
       </div>
       <div className="bg-white rounded-lg border border-slate-200 p-6">
-        <DataTable data={mockPayroll} columns={columns} itemsPerPage={10} searchPlaceholder="Search payroll..." mobileColumns={['staff_name', 'net_pay', 'status']} />
+        <DataTable data={mockPayroll} columns={columns} itemsPerPage={10} searchPlaceholder="Search payroll..." filters={filters} mobileColumns={['staff_name', 'net_pay', 'status']} />
       </div>
     </div>
   )

@@ -121,6 +121,27 @@ export default function OrganizationsPage() {
 
   const canManageOrganizations = hasPermission('manage_organizations')
 
+  const filters = [
+    {
+      key: 'type',
+      label: 'Organization Type',
+      options: [
+        { value: 'Government', label: 'Government' },
+        { value: 'NGO', label: 'NGO' },
+        { value: 'Corporate', label: 'Corporate' },
+        { value: 'Individual', label: 'Individual' },
+      ],
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      options: [
+        { value: 'active', label: 'Active' },
+        { value: 'inactive', label: 'Inactive' },
+      ],
+    },
+  ]
+
   const columns: Column<Organization>[] = [
     {
       key: 'name',
@@ -224,6 +245,7 @@ export default function OrganizationsPage() {
           columns={columns}
           itemsPerPage={10}
           searchPlaceholder="Search organizations..."
+          filters={filters}
           onView={(org) => setSelectedOrg(org)}
           viewButtonText="View"
           mobileColumns={['name', 'type', 'documents_count']}
