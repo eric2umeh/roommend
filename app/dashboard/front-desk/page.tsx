@@ -497,43 +497,48 @@ export default function FrontDeskPage() {
                   </label>
                 </div>
 
-                {selectedRoom && (
-                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
-                    <h3 className="font-semibold text-slate-900 mb-2">Reservation Summary</h3>
-                    <div className="space-y-1 text-sm text-slate-700">
-                      <div className="flex justify-between">
-                        <span>Room:</span>
-                        <span className="font-medium">{selectedRoom}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Check-in:</span>
-                        <span className="font-medium">{arrivalDate}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Check-out:</span>
-                        <span className="font-medium">{departureDate}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Nights:</span>
-                        <span className="font-medium">{nights}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Guests:</span>
-                        <span className="font-medium">{adults} adults, {children} children</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Breakfast:</span>
-                        <span className="font-medium">{breakfastIncluded ? 'Included' : 'Not included'}</span>
-                      </div>
-                      <div className="flex justify-between pt-2 border-t border-slate-300 mt-2">
-                        <span className="font-semibold">Estimated Total:</span>
-                        <span className="font-bold text-lg text-blue-600">
-                          {'₦' + ((enrichedRooms.find(r => r.room_number === selectedRoom)?.base_price_naira || 0) * nights).toLocaleString()}
-                        </span>
+                {selectedRoom && (() => {
+                  const selectedRoomData = enrichedRooms.find(r => r.room_number === selectedRoom)
+                  const totalPrice = (selectedRoomData?.base_price_naira || 0) * nights
+                  
+                  return (
+                    <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                      <h3 className="font-semibold text-slate-900 mb-2">Reservation Summary</h3>
+                      <div className="space-y-1 text-sm text-slate-700">
+                        <div className="flex justify-between">
+                          <span>Room:</span>
+                          <span className="font-medium">{selectedRoom}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Check-in:</span>
+                          <span className="font-medium">{arrivalDate}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Check-out:</span>
+                          <span className="font-medium">{departureDate}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Nights:</span>
+                          <span className="font-medium">{nights}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Guests:</span>
+                          <span className="font-medium">{adults} adults, {children} children</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Breakfast:</span>
+                          <span className="font-medium">{breakfastIncluded ? 'Included' : 'Not included'}</span>
+                        </div>
+                        <div className="flex justify-between pt-2 border-t border-slate-300 mt-2">
+                          <span className="font-semibold">Estimated Total:</span>
+                          <span className="font-bold text-lg text-blue-600">
+                            ₦{totalPrice.toLocaleString()}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )
+                })()}
 
                 <div className="flex justify-between gap-3 pt-4">
                   <button
