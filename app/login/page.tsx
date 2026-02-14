@@ -29,7 +29,7 @@ export default function LoginPage() {
       if (success) {
         // Small delay to ensure context updates
         await new Promise((resolve) => setTimeout(resolve, 100));
-        router.push("/app");
+        router.push("/dashboard");
       } else {
         setError("Invalid email or password");
       }
@@ -52,7 +52,7 @@ export default function LoginPage() {
           <div className="text-4xl font-bold text-slate-900 mb-2">
             <span className="text-blue-600">Room</span>mend
           </div>
-          <p className="text-slate-600">Hotel Management</p>
+          <p className="text-slate-600">Hotel & Restaurant Management</p>
         </div>
 
         <div className="bg-white rounded-lg border border-slate-200 shadow-lg p-8">
