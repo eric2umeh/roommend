@@ -60,7 +60,7 @@ export default function LandingPage() {
             <Link href="/login">
               <button className="px-4 py-2 text-slate-700 hover:text-slate-900 transition">Sign In</button>
             </Link>
-            <Link href="/app">
+            <Link href="/dashboard">
               <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
                 Get Started
               </button>
@@ -79,7 +79,7 @@ export default function LandingPage() {
           Manage rooms, reservations, guests, restaurant orders, inventory, and staff—all from one beautiful dashboard. Free for your first 5 users.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-          <Link href="/app">
+          <Link href="/dashboard">
             <button className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium text-lg">
               Start Free Trial
             </button>
@@ -141,7 +141,7 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold mb-6">Ready to Transform Your Property?</h2>
           <p className="text-xl mb-8 opacity-90">Join 100+ properties already using Roommend</p>
-          <Link href="/app">
+          <Link href="/dashboard">
             <button className="px-8 py-3 bg-white text-blue-600 rounded-lg hover:bg-slate-100 transition font-medium text-lg">
               Start Free Now
             </button>

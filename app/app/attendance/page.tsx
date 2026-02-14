@@ -32,6 +32,29 @@ export default function AttendancePage() {
     { key: 'status', label: 'Status', render: (v) => <span className={`px-2 py-1 rounded text-xs font-medium ${v === 'present' ? 'bg-green-100 text-green-800' : v === 'absent' ? 'bg-red-100 text-red-800' : v === 'late' ? 'bg-yellow-100 text-yellow-800' : 'bg-orange-100 text-orange-800'}`}>{v.replace('_', ' ')}</span> },
   ]
 
+  const filters = [
+    {
+      key: 'position',
+      label: 'Position',
+      options: [
+        { value: 'Manager', label: 'Manager' },
+        { value: 'Front Desk', label: 'Front Desk' },
+        { value: 'Chef', label: 'Chef' },
+        { value: 'Housekeeper', label: 'Housekeeper' },
+      ],
+    },
+    {
+      key: 'status',
+      label: 'Attendance Status',
+      options: [
+        { value: 'present', label: 'Present' },
+        { value: 'absent', label: 'Absent' },
+        { value: 'late', label: 'Late' },
+        { value: 'half_day', label: 'Half Day' },
+      ],
+    },
+  ]
+
   return (
     <div className="space-y-6">
       <div>
@@ -39,7 +62,7 @@ export default function AttendancePage() {
         <p className="text-slate-600 mt-2">Track daily staff attendance and work hours</p>
       </div>
       <div className="bg-white rounded-lg border border-slate-200 p-6">
-        <DataTable data={mockAttendance} columns={columns} itemsPerPage={10} searchPlaceholder="Search attendance..." mobileColumns={['staff_name', 'check_in', 'status']} />
+        <DataTable data={mockAttendance} columns={columns} itemsPerPage={10} searchPlaceholder="Search attendance..." filters={filters} mobileColumns={['staff_name', 'check_in', 'status']} />
       </div>
     </div>
   )
