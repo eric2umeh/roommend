@@ -31,6 +31,17 @@ export default function BillingPage() {
     { key: 'status', label: 'Status', render: (v) => <span className={`px-2 py-1 rounded text-xs ${v === 'paid' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}`}>{v}</span> },
   ]
 
+  const filters = [
+    {
+      key: 'status',
+      label: 'Payment Status',
+      options: [
+        { value: 'paid', label: 'Paid' },
+        { value: 'pending', label: 'Pending' },
+      ],
+    },
+  ]
+
   return (
     <div className="space-y-6">
       <div>
@@ -38,7 +49,7 @@ export default function BillingPage() {
         <p className="text-slate-600 mt-2">Manage guest invoices and payments</p>
       </div>
       <div className="bg-white rounded-lg border border-slate-200 p-6">
-        <DataTable data={mockBilling} columns={columns} itemsPerPage={10} searchPlaceholder="Search guest billing..." mobileColumns={['guest_name', 'total', 'status']} />
+        <DataTable data={mockBilling} columns={columns} itemsPerPage={10} searchPlaceholder="Search guest billing..." filters={filters} mobileColumns={['guest_name', 'total', 'status']} />
       </div>
     </div>
   )
