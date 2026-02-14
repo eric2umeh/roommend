@@ -33,6 +33,27 @@ export default function MenuPage() {
     },
   ]
 
+  const filters = [
+    {
+      key: 'category',
+      label: 'Category',
+      options: [
+        { value: 'Mains', label: 'Mains' },
+        { value: 'Soups', label: 'Soups' },
+        { value: 'Appetizers', label: 'Appetizers' },
+        { value: 'Sides', label: 'Sides' },
+      ],
+    },
+    {
+      key: 'availability',
+      label: 'Availability',
+      options: [
+        { value: 'available', label: 'Available' },
+        { value: 'unavailable', label: 'Unavailable' },
+      ],
+    },
+  ]
+
   return (
     <div className="space-y-6">
       <div>
@@ -40,7 +61,7 @@ export default function MenuPage() {
         <p className="text-slate-600 mt-2">Create and manage restaurant menu items</p>
       </div>
       <div className="bg-white rounded-lg border border-slate-200 p-6">
-        <DataTable data={mockMenuItems} columns={columns} itemsPerPage={10} searchPlaceholder="Search menu items..." mobileColumns={['name', 'price', 'availability']} />
+        <DataTable data={mockMenuItems} columns={columns} itemsPerPage={10} searchPlaceholder="Search menu items..." filters={filters} mobileColumns={['name', 'price', 'availability']} />
       </div>
     </div>
   )
