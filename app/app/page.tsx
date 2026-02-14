@@ -159,12 +159,12 @@ export default function DashboardPage() {
             <div className="bg-white rounded-lg border border-slate-200 p-4">
               <h3 className="font-bold text-slate-900 mb-3 text-sm">Front Desk</h3>
               <div className="space-y-2">
-                <Link href="/app/reservations">
+                <Link href="/dashboard/reservations">
                   <button className="w-full px-3 py-2 text-left border border-slate-300 rounded text-sm hover:bg-slate-50 transition">
                     📅 New Reservation
                   </button>
                 </Link>
-                <Link href="/app/guests">
+                <Link href="/dashboard/guests">
                   <button className="w-full px-3 py-2 text-left border border-slate-300 rounded text-sm hover:bg-slate-50 transition">
                     👥 Check-in Guest
                   </button>
@@ -178,12 +178,12 @@ export default function DashboardPage() {
             <div className="bg-white rounded-lg border border-slate-200 p-4">
               <h3 className="font-bold text-slate-900 mb-3 text-sm">Housekeeping</h3>
               <div className="space-y-2">
-                <Link href="/app/housekeeping">
+                <Link href="/dashboard/housekeeping">
                   <button className="w-full px-3 py-2 text-left border border-slate-300 rounded text-sm hover:bg-slate-50 transition">
                     🧹 View Tasks
                   </button>
                 </Link>
-                <Link href="/app/maintenance">
+                <Link href="/dashboard/maintenance">
                   <button className="w-full px-3 py-2 text-left border border-slate-300 rounded text-sm hover:bg-slate-50 transition">
                     🔧 Maintenance
                   </button>
@@ -197,12 +197,12 @@ export default function DashboardPage() {
             <div className="bg-white rounded-lg border border-slate-200 p-4">
               <h3 className="font-bold text-slate-900 mb-3 text-sm">Restaurant</h3>
               <div className="space-y-2">
-                <Link href="/app/orders">
+                <Link href="/dashboard/orders">
                   <button className="w-full px-3 py-2 text-left border border-slate-300 rounded text-sm hover:bg-slate-50 transition">
                     🍽️ Order Queue
                   </button>
                 </Link>
-                <Link href="/app/menu">
+                <Link href="/dashboard/menu">
                   <button className="w-full px-3 py-2 text-left border border-slate-300 rounded text-sm hover:bg-slate-50 transition">
                     📋 Menu
                   </button>
@@ -216,12 +216,12 @@ export default function DashboardPage() {
             <div className="bg-white rounded-lg border border-slate-200 p-4">
               <h3 className="font-bold text-slate-900 mb-3 text-sm">Finance</h3>
               <div className="space-y-2">
-                <Link href="/app/accounting">
+                <Link href="/dashboard/accounting">
                   <button className="w-full px-3 py-2 text-left border border-slate-300 rounded text-sm hover:bg-slate-50 transition">
                     💳 Transactions
                   </button>
                 </Link>
-                <Link href="/app/billing">
+                <Link href="/dashboard/billing">
                   <button className="w-full px-3 py-2 text-left border border-slate-300 rounded text-sm hover:bg-slate-50 transition">
                     🧾 Billing
                   </button>
@@ -235,12 +235,12 @@ export default function DashboardPage() {
             <div className="bg-white rounded-lg border border-slate-200 p-4">
               <h3 className="font-bold text-slate-900 mb-3 text-sm">Inventory</h3>
               <div className="space-y-2">
-                <Link href="/app/inventory">
+                <Link href="/dashboard/inventory">
                   <button className="w-full px-3 py-2 text-left border border-slate-300 rounded text-sm hover:bg-slate-50 transition">
                     📦 Stock
                   </button>
                 </Link>
-                <Link href="/app/suppliers">
+                <Link href="/dashboard/suppliers">
                   <button className="w-full px-3 py-2 text-left border border-slate-300 rounded text-sm hover:bg-slate-50 transition">
                     🚚 Suppliers
                   </button>
@@ -254,12 +254,12 @@ export default function DashboardPage() {
             <div className="bg-white rounded-lg border border-slate-200 p-4">
               <h3 className="font-bold text-slate-900 mb-3 text-sm">Human Resources</h3>
               <div className="space-y-2">
-                <Link href="/app/staff">
+                <Link href="/dashboard/staff">
                   <button className="w-full px-3 py-2 text-left border border-slate-300 rounded text-sm hover:bg-slate-50 transition">
                     👨‍💼 Staff
                   </button>
                 </Link>
-                <Link href="/app/payroll">
+                <Link href="/dashboard/payroll">
                   <button className="w-full px-3 py-2 text-left border border-slate-300 rounded text-sm hover:bg-slate-50 transition">
                     💰 Payroll
                   </button>
@@ -273,12 +273,12 @@ export default function DashboardPage() {
             <div className="bg-white rounded-lg border border-slate-200 p-4">
               <h3 className="font-bold text-slate-900 mb-3 text-sm">Marketing</h3>
               <div className="space-y-2">
-                <Link href="/app/organizations">
+                <Link href="/dashboard/organizations">
                   <button className="w-full px-3 py-2 text-left border border-slate-300 rounded text-sm hover:bg-slate-50 transition">
                     🏢 Organizations
                   </button>
                 </Link>
-                <Link href="/app/marketing">
+                <Link href="/dashboard/marketing">
                   <button className="w-full px-3 py-2 text-left border border-slate-300 rounded text-sm hover:bg-slate-50 transition">
                     📢 Campaigns
                   </button>
