@@ -7,11 +7,26 @@ import { mockOrganization, mockLocation, mockRooms, mockReservations } from '@/l
 
 export default function DashboardPage() {
   const [selectedLocation] = useState(mockLocation)
-  const { hasPermission } = useAuth()
+  const { role, hasPermission } = useAuth()
 
-  // Only show revenue/booking data to managers and admins
-  const canViewFinancials = hasPermission('view_reports') || hasPermission('manage_reservations')
-  const canViewReservations = hasPermission('manage_reservations') || hasPermission('check_in_guests')
+  // Role-based permission checks for 8+ departments
+  const isAdmin = role?.name === 'Admin'
+  const isManager = role?.name === 'Manager'
+  const isFrontDesk = role?.name === 'Front Desk'
+  const isHousekeeping = role?.name === 'Housekeeping'
+  const isKitchen = role?.name === 'Kitchen'
+  const isAccounting = role?.name === 'Accounting'
+  const isMarketing = role?.name === 'Marketing'
+  const isHR = role?.name === 'HR'
+
+  // Permission-based visibility for all departments
+  const canViewFinancials = isAdmin || isManager || isAccounting || hasPermission('view_reports')
+  const canViewReservations = isAdmin || isManager || isFrontDesk || hasPermission('manage_reservations')
+  const canViewHousekeeping = isAdmin || isManager || isHousekeeping || hasPermission('manage_tasks')
+  const canViewRestaurant = isAdmin || isManager || isKitchen || hasPermission('manage_orders')
+  const canViewInventory = isAdmin || isManager || hasPermission('manage_inventory')
+  const canViewStaff = isAdmin || isManager || isHR || hasPermission('manage_staff')
+  const canViewOrganizations = isAdmin || isMarketing || hasPermission('manage_organizations')
 
   const roomStats = {
     total: mockRooms.length,
@@ -25,48 +40,95 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8">
+      {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-slate-900">{mockOrganization.name}</h1>
         <p className="text-slate-600 mt-2">
           {selectedLocation.name} • {selectedLocation.city}, {selectedLocation.state}
         </p>
+        <p className="text-sm text-slate-500 mt-1">Role: <span className="font-semibold text-slate-700">{role?.name || 'Guest'}</span></p>
       </div>
 
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg border border-slate-200 p-6">
-          <div className="text-sm text-slate-600 mb-2">Occupancy Rate</div>
-          <div className="text-3xl font-bold text-slate-900">{occupancyRate}%</div>
-          <p className="text-xs text-slate-500 mt-2">{roomStats.occupied} of {roomStats.total} rooms</p>
-        </div>
-
-        {canViewFinancials && (
-          <div className="bg-white rounded-lg border border-slate-200 p-6">
-            <div className="text-sm text-slate-600 mb-2">Today's Revenue</div>
-            <div className="text-3xl font-bold text-slate-900">₦165,000</div>
-            <p className="text-xs text-slate-500 mt-2">From {mockReservations.length} active reservations</p>
+      {/* Operations Overview - All Users */}
+      <section className="space-y-4">
+        <h2 className="text-lg font-bold text-slate-900">Operations Overview</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Occupancy Rate - All */}
+          <div className="bg-white rounded-lg border border-slate-200 p-6 hover:shadow-md transition">
+            <div className="text-sm text-slate-600 mb-2">Occupancy Rate</div>
+            <div className="text-3xl font-bold text-blue-600">{occupancyRate}%</div>
+            <p className="text-xs text-slate-500 mt-2">{roomStats.occupied} of {roomStats.total} rooms</p>
           </div>
-        )}
 
-        <div className="bg-white rounded-lg border border-slate-200 p-6">
-          <div className="text-sm text-slate-600 mb-2">Pending Tasks</div>
-          <div className="text-3xl font-bold text-slate-900">3</div>
-          <p className="text-xs text-slate-500 mt-2">Housekeeping items</p>
+          {/* Revenue - Finance & Management */}
+          {canViewFinancials && (
+            <div className="bg-white rounded-lg border border-slate-200 p-6 hover:shadow-md transition">
+              <div className="text-sm text-slate-600 mb-2">Today's Revenue</div>
+              <div className="text-3xl font-bold text-green-600">₦165,000</div>
+              <p className="text-xs text-slate-500 mt-2">From {mockReservations.length} reservations</p>
+            </div>
+          )}
+
+          {/* Housekeeping Tasks - Operations & Housekeeping */}
+          {canViewHousekeeping && (
+            <div className="bg-white rounded-lg border border-slate-200 p-6 hover:shadow-md transition">
+              <div className="text-sm text-slate-600 mb-2">Pending Tasks</div>
+              <div className="text-3xl font-bold text-orange-600">8</div>
+              <p className="text-xs text-slate-500 mt-2">Housekeeping items</p>
+            </div>
+          )}
+
+          {/* Active Guests - Front Desk */}
+          {canViewReservations && (
+            <div className="bg-white rounded-lg border border-slate-200 p-6 hover:shadow-md transition">
+              <div className="text-sm text-slate-600 mb-2">Active Guests</div>
+              <div className="text-3xl font-bold text-purple-600">{mockReservations.length}</div>
+              <p className="text-xs text-slate-500 mt-2">Currently checked in</p>
+            </div>
+          )}
+
+          {/* Restaurant Orders - Kitchen */}
+          {canViewRestaurant && (
+            <div className="bg-white rounded-lg border border-slate-200 p-6 hover:shadow-md transition">
+              <div className="text-sm text-slate-600 mb-2">Orders Today</div>
+              <div className="text-3xl font-bold text-red-600">12</div>
+              <p className="text-xs text-slate-500 mt-2">5 pending, 7 completed</p>
+            </div>
+          )}
+
+          {/* Inventory Items - Operations */}
+          {canViewInventory && (
+            <div className="bg-white rounded-lg border border-slate-200 p-6 hover:shadow-md transition">
+              <div className="text-sm text-slate-600 mb-2">Low Stock Items</div>
+              <div className="text-3xl font-bold text-yellow-600">3</div>
+              <p className="text-xs text-slate-500 mt-2">Requires reordering</p>
+            </div>
+          )}
+
+          {/* Staff On Duty - HR & Management */}
+          {canViewStaff && (
+            <div className="bg-white rounded-lg border border-slate-200 p-6 hover:shadow-md transition">
+              <div className="text-sm text-slate-600 mb-2">Staff On Duty</div>
+              <div className="text-3xl font-bold text-indigo-600">14</div>
+              <p className="text-xs text-slate-500 mt-2">Out of 25 total</p>
+            </div>
+          )}
+
+          {/* Organizations - Marketing */}
+          {canViewOrganizations && (
+            <div className="bg-white rounded-lg border border-slate-200 p-6 hover:shadow-md transition">
+              <div className="text-sm text-slate-600 mb-2">Active Organizations</div>
+              <div className="text-3xl font-bold text-pink-600">7</div>
+              <p className="text-xs text-slate-500 mt-2">Government, NGO, Corporate</p>
+            </div>
+          )}
         </div>
+      </section>
 
-        {canViewReservations && (
-          <div className="bg-white rounded-lg border border-slate-200 p-6">
-            <div className="text-sm text-slate-600 mb-2">Active Guests</div>
-            <div className="text-3xl font-bold text-slate-900">{mockReservations.length}</div>
-            <p className="text-xs text-slate-500 mt-2">Currently checked in</p>
-          </div>
-        )}
-      </div>
-
-      {/* Room Status Overview & Quick Actions */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 bg-white rounded-lg border border-slate-200 p-6">
-          <h2 className="text-xl font-bold text-slate-900 mb-4">Room Status Overview</h2>
+      {/* Room Status Overview */}
+      {(canViewReservations || canViewHousekeeping) && (
+        <section className="bg-white rounded-lg border border-slate-200 p-6">
+          <h2 className="text-lg font-bold text-slate-900 mb-4">Room Status Overview</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center p-4 rounded-lg bg-blue-50 border border-blue-200">
               <div className="text-3xl font-bold text-blue-600">{roomStats.occupied}</div>
@@ -85,39 +147,147 @@ export default function DashboardPage() {
               <div className="text-sm text-red-800 mt-1">Maintenance</div>
             </div>
           </div>
-        </div>
+        </section>
+      )}
 
-        <div className="bg-white rounded-lg border border-slate-200 p-6">
-          <h2 className="text-xl font-bold text-slate-900 mb-4">Quick Actions</h2>
-          <div className="space-y-3">
-            <Link href="/app/reservations">
-              <button className="w-full px-4 py-2 text-left border border-slate-300 rounded-lg hover:bg-slate-100 transition text-sm">
-                ➕ New Reservation
-              </button>
-            </Link>
-            <Link href="/app/guests">
-              <button className="w-full px-4 py-2 text-left border border-slate-300 rounded-lg hover:bg-slate-100 transition text-sm">
-                👥 Manage Guests
-              </button>
-            </Link>
-            <Link href="/app/rooms">
-              <button className="w-full px-4 py-2 text-left border border-slate-300 rounded-lg hover:bg-slate-100 transition text-sm">
-                🏨 View All Rooms
-              </button>
-            </Link>
-            <Link href="/app/orders">
-              <button className="w-full px-4 py-2 text-left border border-slate-300 rounded-lg hover:bg-slate-100 transition text-sm">
-                🍽️ POS Orders
-              </button>
-            </Link>
-            <Link href="/app/housekeeping">
-              <button className="w-full px-4 py-2 text-left border border-slate-300 rounded-lg hover:bg-slate-100 transition text-sm">
-                🧹 Housekeeping
-              </button>
-            </Link>
-          </div>
+      {/* Department-Specific Quick Actions */}
+      <section className="space-y-4">
+        <h2 className="text-lg font-bold text-slate-900">Quick Actions by Department</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Front Desk */}
+          {(canViewReservations || isFrontDesk) && (
+            <div className="bg-white rounded-lg border border-slate-200 p-4">
+              <h3 className="font-bold text-slate-900 mb-3 text-sm">Front Desk</h3>
+              <div className="space-y-2">
+                <Link href="/app/reservations">
+                  <button className="w-full px-3 py-2 text-left border border-slate-300 rounded text-sm hover:bg-slate-50 transition">
+                    📅 New Reservation
+                  </button>
+                </Link>
+                <Link href="/app/guests">
+                  <button className="w-full px-3 py-2 text-left border border-slate-300 rounded text-sm hover:bg-slate-50 transition">
+                    👥 Check-in Guest
+                  </button>
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {/* Housekeeping */}
+          {canViewHousekeeping && (
+            <div className="bg-white rounded-lg border border-slate-200 p-4">
+              <h3 className="font-bold text-slate-900 mb-3 text-sm">Housekeeping</h3>
+              <div className="space-y-2">
+                <Link href="/app/housekeeping">
+                  <button className="w-full px-3 py-2 text-left border border-slate-300 rounded text-sm hover:bg-slate-50 transition">
+                    🧹 View Tasks
+                  </button>
+                </Link>
+                <Link href="/app/maintenance">
+                  <button className="w-full px-3 py-2 text-left border border-slate-300 rounded text-sm hover:bg-slate-50 transition">
+                    🔧 Maintenance
+                  </button>
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {/* Restaurant & Kitchen */}
+          {canViewRestaurant && (
+            <div className="bg-white rounded-lg border border-slate-200 p-4">
+              <h3 className="font-bold text-slate-900 mb-3 text-sm">Restaurant</h3>
+              <div className="space-y-2">
+                <Link href="/app/orders">
+                  <button className="w-full px-3 py-2 text-left border border-slate-300 rounded text-sm hover:bg-slate-50 transition">
+                    🍽️ Order Queue
+                  </button>
+                </Link>
+                <Link href="/app/menu">
+                  <button className="w-full px-3 py-2 text-left border border-slate-300 rounded text-sm hover:bg-slate-50 transition">
+                    📋 Menu
+                  </button>
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {/* Finance */}
+          {canViewFinancials && (
+            <div className="bg-white rounded-lg border border-slate-200 p-4">
+              <h3 className="font-bold text-slate-900 mb-3 text-sm">Finance</h3>
+              <div className="space-y-2">
+                <Link href="/app/accounting">
+                  <button className="w-full px-3 py-2 text-left border border-slate-300 rounded text-sm hover:bg-slate-50 transition">
+                    💳 Transactions
+                  </button>
+                </Link>
+                <Link href="/app/billing">
+                  <button className="w-full px-3 py-2 text-left border border-slate-300 rounded text-sm hover:bg-slate-50 transition">
+                    🧾 Billing
+                  </button>
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {/* Inventory */}
+          {canViewInventory && (
+            <div className="bg-white rounded-lg border border-slate-200 p-4">
+              <h3 className="font-bold text-slate-900 mb-3 text-sm">Inventory</h3>
+              <div className="space-y-2">
+                <Link href="/app/inventory">
+                  <button className="w-full px-3 py-2 text-left border border-slate-300 rounded text-sm hover:bg-slate-50 transition">
+                    📦 Stock
+                  </button>
+                </Link>
+                <Link href="/app/suppliers">
+                  <button className="w-full px-3 py-2 text-left border border-slate-300 rounded text-sm hover:bg-slate-50 transition">
+                    🚚 Suppliers
+                  </button>
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {/* Human Resources */}
+          {canViewStaff && (
+            <div className="bg-white rounded-lg border border-slate-200 p-4">
+              <h3 className="font-bold text-slate-900 mb-3 text-sm">Human Resources</h3>
+              <div className="space-y-2">
+                <Link href="/app/staff">
+                  <button className="w-full px-3 py-2 text-left border border-slate-300 rounded text-sm hover:bg-slate-50 transition">
+                    👨‍💼 Staff
+                  </button>
+                </Link>
+                <Link href="/app/payroll">
+                  <button className="w-full px-3 py-2 text-left border border-slate-300 rounded text-sm hover:bg-slate-50 transition">
+                    💰 Payroll
+                  </button>
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {/* Marketing */}
+          {canViewOrganizations && (
+            <div className="bg-white rounded-lg border border-slate-200 p-4">
+              <h3 className="font-bold text-slate-900 mb-3 text-sm">Marketing</h3>
+              <div className="space-y-2">
+                <Link href="/app/organizations">
+                  <button className="w-full px-3 py-2 text-left border border-slate-300 rounded text-sm hover:bg-slate-50 transition">
+                    🏢 Organizations
+                  </button>
+                </Link>
+                <Link href="/app/marketing">
+                  <button className="w-full px-3 py-2 text-left border border-slate-300 rounded text-sm hover:bg-slate-50 transition">
+                    📢 Campaigns
+                  </button>
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
-      </div>
+      </section>
 
       {/* Recent Reservations - Only for authorized staff */}
       {canViewReservations && (
