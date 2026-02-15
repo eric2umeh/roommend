@@ -1,165 +1,62 @@
-"use client";
+'use client'
 
-import React from "react";
-import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useAuth } from "@/lib/auth-context";
+import React from 'react'
+import Link from 'next/link'
+import { useRouter, usePathname } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { useAuth } from '@/lib/auth-context'
 
 const SIDEBAR_MENU = [
   // Core Operations
-  { label: "Dashboard", href: "/dashboard", icon: "📊", permissions: [] },
-  {
-    label: "Reservations",
-    href: "/dashboard/reservations",
-    icon: "📅",
-    permissions: ["manage_reservations"],
-  },
-  {
-    label: "Rooms",
-    href: "/dashboard/rooms",
-    icon: "🏨",
-    permissions: ["manage_rooms"],
-  },
-  {
-    label: "Guests",
-    href: "/dashboard/guests",
-    icon: "👥",
-    permissions: ["view_guests"],
-  },
-
+  { label: 'Dashboard', href: '/dashboard', icon: '📊', permissions: [] },
+  { label: 'Front Desk', href: '/dashboard/front-desk', icon: '🏨', permissions: ['manage_reservations', 'view_guests'] },
+  { label: 'Rooms', href: '/dashboard/rooms', icon: '🛏️', permissions: ['manage_rooms'] },
+  
   // Restaurant & Food Service
-  {
-    label: "Restaurant Orders",
-    href: "/dashboard/orders",
-    icon: "🍽️",
-    permissions: ["manage_orders"],
-  },
-  {
-    label: "Menu",
-    href: "/dashboard/menu",
-    icon: "📋",
-    permissions: ["manage_menu"],
-  },
-
+  { label: 'Restaurant', href: '/dashboard/restaurant', icon: '🍽️', permissions: ['manage_orders', 'manage_menu'] },
+  
   // Inventory & Supplies
-  {
-    label: "Inventory",
-    href: "/dashboard/inventory",
-    icon: "📦",
-    permissions: ["manage_inventory"],
-  },
-  {
-    label: "Suppliers",
-    href: "/dashboard/suppliers",
-    icon: "🚚",
-    permissions: ["manage_suppliers"],
-  },
-
+  { label: 'Inventory', href: '/dashboard/inventory', icon: '📦', permissions: ['manage_inventory'] },
+  { label: 'Suppliers', href: '/dashboard/suppliers', icon: '🚚', permissions: ['manage_suppliers'] },
+  
   // Housekeeping & Maintenance
-  {
-    label: "Housekeeping",
-    href: "/dashboard/housekeeping",
-    icon: "🧹",
-    permissions: ["manage_tasks"],
-  },
-  {
-    label: "Maintenance",
-    href: "/dashboard/maintenance",
-    icon: "🔧",
-    permissions: ["manage_maintenance"],
-  },
-
+  { label: 'Housekeeping', href: '/dashboard/housekeeping', icon: '🧹', permissions: ['manage_tasks'] },
+  { label: 'Maintenance', href: '/dashboard/maintenance', icon: '🔧', permissions: ['manage_maintenance'] },
+  
   // Human Resources
-  {
-    label: "Staff",
-    href: "/dashboard/staff",
-    icon: "👨‍💼",
-    permissions: ["manage_staff"],
-  },
-  {
-    label: "Payroll",
-    href: "/dashboard/payroll",
-    icon: "💰",
-    permissions: ["manage_payroll"],
-  },
-  {
-    label: "Attendance",
-    href: "/dashboard/attendance",
-    icon: "📍",
-    permissions: ["manage_attendance"],
-  },
-
+  { label: 'Staff', href: '/dashboard/staff', icon: '👨‍💼', permissions: ['manage_staff'] },
+  { label: 'Payroll', href: '/dashboard/payroll', icon: '💰', permissions: ['manage_payroll'] },
+  { label: 'Attendance', href: '/dashboard/attendance', icon: '📍', permissions: ['manage_attendance'] },
+  
   // Finance & Accounting
-  {
-    label: "Accounting",
-    href: "/dashboard/accounting",
-    icon: "💳",
-    permissions: ["manage_accounting"],
-  },
-  {
-    label: "Billing",
-    href: "/dashboard/billing",
-    icon: "🧾",
-    permissions: ["manage_billing"],
-  },
-
+  { label: 'Accounting', href: '/dashboard/accounting', icon: '💳', permissions: ['manage_accounting'] },
+  { label: 'Billing', href: '/dashboard/billing', icon: '🧾', permissions: ['manage_billing'] },
+  
   // Marketing & Organizations
-  {
-    label: "Marketing",
-    href: "/dashboard/marketing",
-    icon: "📢",
-    permissions: ["manage_marketing"],
-  },
-  {
-    label: "Organizations",
-    href: "/dashboard/organizations",
-    icon: "🏢",
-    permissions: ["manage_organizations"],
-  },
-
+  { label: 'Marketing', href: '/dashboard/marketing', icon: '📢', permissions: ['manage_marketing'] },
+  { label: 'Organizations', href: '/dashboard/organizations', icon: '🏢', permissions: ['manage_organizations'] },
+  
   // Analytics & Reports
-  {
-    label: "Reports",
-    href: "/dashboard/reports",
-    icon: "📈",
-    permissions: ["view_reports"],
-  },
-  {
-    label: "Analytics",
-    href: "/dashboard/analytics",
-    icon: "📉",
-    permissions: ["view_analytics"],
-  },
-
+  { label: 'Reports', href: '/dashboard/reports', icon: '📈', permissions: ['view_reports'] },
+  { label: 'Analytics', href: '/dashboard/analytics', icon: '📉', permissions: ['view_analytics'] },
+  
   // Admin
-  {
-    label: "Settings",
-    href: "/dashboard/settings",
-    icon: "⚙️",
-    permissions: ["access_settings"],
-  },
-  {
-    label: "Roles & Permissions",
-    href: "/dashboard/settings/roles",
-    icon: "🔐",
-    permissions: ["manage_roles"],
-  },
-];
+  { label: 'Settings', href: '/dashboard/settings', icon: '⚙️', permissions: ['access_settings'] },
+  { label: 'Roles & Permissions', href: '/dashboard/settings/roles', icon: '🔐', permissions: ['manage_roles'] },
+]
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const { user, role, isLoggedIn, isLoading, logout, hasAnyPermission } =
-    useAuth();
-  const router = useRouter();
-  const pathname = usePathname();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const { user, role, isLoggedIn, isLoading, logout, hasAnyPermission } = useAuth()
+  const router = useRouter()
+  const pathname = usePathname()
+  const [sidebarOpen, setSidebarOpen] = useState(true)
 
   useEffect(() => {
     if (!isLoading && !isLoggedIn) {
-      console.log("[v0] Auth check: not logged in, redirecting to login");
-      router.push("/login");
+      console.log('[v0] Auth check: not logged in, redirecting to login')
+      router.push('/login')
     }
-  }, [isLoggedIn, isLoading, router]);
+  }, [isLoggedIn, isLoading, router])
 
   if (!isLoggedIn || isLoading) {
     return (
@@ -169,25 +66,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <p className="text-slate-600">Loading Roommend...</p>
         </div>
       </div>
-    );
+    )
   }
 
   const visibleMenuItems = SIDEBAR_MENU.filter(
-    (item) =>
-      item.permissions.length === 0 || hasAnyPermission(item.permissions),
-  );
+    (item) => item.permissions.length === 0 || hasAnyPermission(item.permissions)
+  )
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
       {/* Desktop Sidebar - Hidden on mobile */}
-      <aside
-        className={`${sidebarOpen ? "w-64" : "w-20"} bg-slate-900 text-white transition-all duration-300 hidden md:flex flex-col border-r border-slate-800`}
-      >
+      <aside className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-slate-900 text-white transition-all duration-300 hidden md:flex flex-col border-r border-slate-800`}>
         <div className="p-4 border-b border-slate-800">
-          <Link
-            href="/app"
-            className="flex items-center gap-2 font-bold text-lg"
-          >
+          <Link href="/dashboard" className="flex items-center gap-2 font-bold text-lg">
             <span className="text-2xl">🏨</span>
             {sidebarOpen && <span>Roommend</span>}
           </Link>
@@ -200,8 +91,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               href={item.href}
               className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${
                 pathname === item.href
-                  ? "bg-blue-600 text-white"
-                  : "text-slate-300 hover:bg-slate-800"
+                  ? 'bg-blue-600 text-white'
+                  : 'text-slate-300 hover:bg-slate-800'
               }`}
             >
               <span className="text-xl">{item.icon}</span>
@@ -223,7 +114,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             onClick={logout}
             className="w-full px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded-lg transition"
           >
-            {sidebarOpen ? "Sign Out" : "⬅️"}
+            {sidebarOpen ? 'Sign Out' : '⬅️'}
           </button>
         </div>
 
@@ -231,9 +122,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="w-full p-2 rounded-lg hover:bg-slate-800 text-slate-300"
-            title={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+            title={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
           >
-            {sidebarOpen ? "◀" : "▶"}
+            {sidebarOpen ? '◀' : '▶'}
           </button>
         </div>
       </aside>
@@ -249,14 +140,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       {/* Mobile Sidebar Drawer */}
       <aside
         className={`fixed left-0 top-0 h-screen w-64 bg-slate-900 text-white transition-transform duration-300 flex flex-col border-r border-slate-800 md:hidden z-50 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         <div className="p-4 border-b border-slate-800 flex items-center justify-between">
-          <Link
-            href="/app"
-            className="flex items-center gap-2 font-bold text-lg"
-          >
+          <Link href="/dashboard" className="flex items-center gap-2 font-bold text-lg">
             <span className="text-2xl">🏨</span>
             <span>Roommend</span>
           </Link>
@@ -276,8 +164,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               onClick={() => setSidebarOpen(false)}
               className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${
                 pathname === item.href
-                  ? "bg-blue-600 text-white"
-                  : "text-slate-300 hover:bg-slate-800"
+                  ? 'bg-blue-600 text-white'
+                  : 'text-slate-300 hover:bg-slate-800'
               }`}
             >
               <span className="text-xl">{item.icon}</span>
@@ -335,5 +223,5 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </main>
       </div>
     </div>
-  );
+  )
 }

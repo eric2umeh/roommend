@@ -69,14 +69,17 @@ npm run dev
 
 ### Demo Accounts
 
-**Note:** For security reasons, demo credentials are not stored in the repository. Contact the development team for testing accounts.
+**Admin Account:**
+- Email: `***REMOVED***`
+- Password: `demo`
 
-**Available Roles:**
-- Admin Account - Full system access
-- Front Desk Account - Room and reservation management
-- Housekeeping Account - Task and maintenance management
+**Front Desk Account:**
+- Email: `***REMOVED***`
+- Password: `demo`
 
-For local development, use your own Supabase authentication or create test users in the Supabase dashboard.
+**Housekeeping Account:**
+- Email: `***REMOVED***`
+- Password: `demo`
 
 ## 📁 Project Structure
 
