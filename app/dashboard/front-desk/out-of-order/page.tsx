@@ -52,6 +52,7 @@ export default function OutOfOrderPage() {
         </div>
       </div>
     </div>
+  )
   }
 
   const columns: Column<OutOfOrderRoom>[] = [
